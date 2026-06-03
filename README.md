@@ -1,3 +1,5 @@
+![Views](https://api.moocheng.com/badges/views/adamsaou/Nook.svg)
+
 # Nook
 
 Nook is a calm focus environment that helps students and creators start working instantly, stay focused, and work together through silent co-working spaces.
