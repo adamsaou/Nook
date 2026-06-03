@@ -1,4 +1,4 @@
-![Views](https://api.moocheng.com/badges/views/adamsaou/Nook.svg)
+![Lines of Code](https://img.shields.io/tokei/lines/github/adamsaou/Nook?color=blue&label=lines%20of%20code)
 
 # Nook
 
