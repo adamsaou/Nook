@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signup } from "@/app/auth/actions";
 import { Button } from "@/components/ui/Button";
 import { Wordmark } from "@/components/shared/Wordmark";
+import { OAuthButtons } from "@/components/auth/OAuthButtons";
 
 export default async function SignupPage({
   searchParams,
@@ -22,6 +23,14 @@ export default async function SignupPage({
         {error && (
           <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
         )}
+
+        <OAuthButtons next="/rooms" />
+
+        <div className="flex items-center gap-3 text-xs text-foreground/40">
+          <span className="h-px flex-1 bg-foreground/10" />
+          or
+          <span className="h-px flex-1 bg-foreground/10" />
+        </div>
 
         <form action={signup} className="flex flex-col gap-3">
           <input
