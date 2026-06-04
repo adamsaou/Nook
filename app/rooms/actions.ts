@@ -44,7 +44,7 @@ export async function joinRoom(formData: FormData) {
 
   const { error } = await supabase
     .from("room_members")
-    .upsert({ room_id: roomId, user_id: user.id }, { onConflict: "room_id,user_id" });
+    .upsert({ room_id: roomId, user_id: user.id }, { onConflict: "room_id,user_id" , ignoreDuplicates: true});
   if (error) roomsError(error.message);
 
   revalidatePath("/rooms");
@@ -67,7 +67,7 @@ export async function joinRandom() {
   const random = rooms[Math.floor(Math.random() * rooms.length)];
   const { error } = await supabase
     .from("room_members")
-    .upsert({ room_id: random.id, user_id: user.id }, { onConflict: "room_id,user_id" });
+    .upsert({ room_id: random.id, user_id: user.id }, { onConflict: "room_id,user_id" , ignoreDuplicates: true});
   if (error) roomsError(error.message);
 
   redirect(`/rooms/${random.id}`);

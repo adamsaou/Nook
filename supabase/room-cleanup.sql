@@ -40,6 +40,6 @@ end $$;
 
 select cron.schedule(
   'nook-cleanup-stale-rooms',
-  '*/2 * * * *',
-  $$ delete from public.rooms where last_active_at < now() - interval '5 minutes' $$
+  '*/5 * * * *', -- check every 5 minutes
+  $$ delete from public.rooms where last_active_at < now() - interval '30 minutes' $$
 );
