@@ -32,9 +32,7 @@ export default async function RoomPage({
     .maybeSingle();
   if (!membership) {
     if (room.visibility === "public") {
-      await supabase
-        .from("room_members")
-        .upsert({ room_id: id, user_id: user.id }, { onConflict: "room_id,user_id" , ignoreDuplicates: true});
+      await supabase.rpc("join_room", { p_room_id: id });
     } else {
       redirect(`/rooms?error=${encodeURIComponent("That room is private")}`);
     }

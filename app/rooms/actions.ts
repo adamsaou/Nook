@@ -42,9 +42,7 @@ export async function joinRoom(formData: FormData) {
   const roomId = String(formData.get("roomId") ?? "");
   if (!roomId) roomsError("Missing room");
 
-  const { error } = await supabase
-    .from("room_members")
-    .upsert({ room_id: roomId, user_id: user.id }, { onConflict: "room_id,user_id" , ignoreDuplicates: true});
+  const { error } = await supabase.rpc("join_room", { p_room_id: roomId });
   if (error) roomsError(error.message);
 
   revalidatePath("/rooms");
@@ -65,9 +63,7 @@ export async function joinRandom() {
   if (!rooms || rooms.length === 0) roomsError("No public rooms yet — create one!");
 
   const random = rooms[Math.floor(Math.random() * rooms.length)];
-  const { error } = await supabase
-    .from("room_members")
-    .upsert({ room_id: random.id, user_id: user.id }, { onConflict: "room_id,user_id" , ignoreDuplicates: true});
+  const { error } = await supabase.rpc("join_room", { p_room_id: random.id });
   if (error) roomsError(error.message);
 
   redirect(`/rooms/${random.id}`);
