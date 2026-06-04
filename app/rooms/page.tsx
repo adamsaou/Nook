@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
 import { AppHeader } from "@/components/shared/AppHeader";
 import { createRoom, joinRandom, joinRoom } from "./actions";
+import { SubmitButton } from "@/components/ui/SubmitButton";
 
 export default async function RoomsPage({
   searchParams,
@@ -69,9 +70,9 @@ export default async function RoomsPage({
               <option value="public">Public</option>
               <option value="private">Private</option>
             </select>
-            <Button type="submit" variant="primary" className="py-2.5">
+            <SubmitButton>
               Create
-            </Button>
+            </SubmitButton>
           </form>
           <form action={joinRandom}>
             <Button type="submit" variant="secondary" className="w-full py-2.5">
