@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+:root {
+  --background: #fff8e7; /* Nook Cream */
+  --foreground: #000000; /* Nook Black */
+  --accent: #16f5a3; /* Nook Accent Green */
+  --surface: #ffffff; /* Nook Pure White */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-accent: var(--accent);
+  --color-surface: var(--surface);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  /* Soft accent glow, anchored top-center */
+  background-image: radial-gradient(
+    70% 55% at 50% -5%,
+    rgba(22, 245, 163, 0.12),
+    transparent 65%
+  );
+  background-repeat: no-repeat;
+}
+
+/* Signature dotted backdrop, faded toward the edges so it frames the content */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.06) 1px, transparent 1.5px);
+  background-size: 26px 26px;
+  -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 0%, transparent 80%);
+  mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 0%, transparent 80%);
+}
