@@ -128,6 +128,15 @@ export function RoomView({
     };
   }, [supabase, roomId]);
 
+  useEffect(() => {
+    const beat = () => {
+      void supabase.rpc("touch_room", { p_room_id: roomId});
+    };
+    beat();
+    const id = setInterval(beat, 30000);
+    return () => clearInterval(id);
+  }, [supabase, roomId]);
+
   // ---- One ticker: drives all displayed timers + completion ----
   useEffect(() => {
     const id = setInterval(() => {
