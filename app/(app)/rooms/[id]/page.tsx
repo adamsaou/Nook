@@ -1,6 +1,5 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { AppHeader } from "@/components/shared/AppHeader";
 import { RoomView } from "@/components/rooms/RoomView";
 
 export default async function RoomPage({
@@ -61,15 +60,12 @@ export default async function RoomPage({
   }));
 
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader username={profile?.username} />
-      <RoomView
-        roomId={room.id}
-        roomName={room.name}
-        userId={user.id}
-        username={profile?.username ?? "anon"}
-        initialMessages={initialMessages}
-      />
-    </div>
+    <RoomView
+      roomId={room.id}
+      roomName={room.name}
+      userId={user.id}
+      username={profile?.username ?? "anon"}
+      initialMessages={initialMessages}
+    />
   );
 }

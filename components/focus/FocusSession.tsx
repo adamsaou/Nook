@@ -129,14 +129,7 @@ export default function FocusSession() {
   }
 
   return (
-    <div className="flex flex-1 flex-col">
-      <header className="px-6 py-5 sm:px-10">
-        <span className="text-2xl font-bold tracking-tight">
-          Nook<span className="text-accent">.</span>
-        </span>
-      </header>
-
-      <main className="flex flex-1 items-center justify-center p-6">
+    <main className="flex flex-1 items-center justify-center p-6">
         <div className="flex w-full max-w-md flex-col items-center gap-8 rounded-3xl border border-foreground/10 bg-surface px-8 py-14 text-center shadow-sm">
           {phase === "idle" && (
             <>
@@ -217,7 +210,6 @@ export default function FocusSession() {
             </>
           )}
         </div>
-      </main>
-    </div>
+    </main>
   );
 }

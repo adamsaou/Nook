@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
-import { AppHeader } from "@/components/shared/AppHeader";
 import { createRoom, joinRandom, joinRoom } from "./actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
@@ -17,28 +16,23 @@ export default async function RoomsPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const [{ data: profile }, { data: publicRooms }, { data: memberships }] =
-    await Promise.all([
-      supabase.from("profiles").select("username").eq("id", user!.id).single(),
-      supabase
-        .from("rooms")
-        .select("id, name, visibility, created_at")
-        .eq("visibility", "public")
-        .order("created_at", { ascending: false })
-        .limit(50),
-      supabase
-        .from("room_members")
-        .select("room_id, rooms(id, name, visibility)")
-        .eq("user_id", user!.id),
-    ]);
+  const [{ data: publicRooms }, { data: memberships }] = await Promise.all([
+    supabase
+      .from("rooms")
+      .select("id, name, visibility, created_at")
+      .eq("visibility", "public")
+      .order("created_at", { ascending: false })
+      .limit(50),
+    supabase
+      .from("room_members")
+      .select("room_id, rooms(id, name, visibility)")
+      .eq("user_id", user!.id),
+  ]);
 
   const myRoomIds = new Set((memberships ?? []).map((m) => m.room_id));
 
   return (
-    <div className="flex flex-1 flex-col">
-      <AppHeader username={profile?.username} />
-
-      <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 p-6">
+    <main className="mx-auto flex w-full max-w-2xl flex-1 flex-col gap-8 p-6">
         <div>
           <h1 className="text-3xl font-extrabold tracking-tight">
             Study rooms<span className="text-accent">.</span>
@@ -115,7 +109,6 @@ export default async function RoomsPage({
             <p className="text-sm text-foreground/50">No public rooms yet. Create the first one!</p>
           )}
         </section>
-      </main>
-    </div>
+    </main>
   );
 }

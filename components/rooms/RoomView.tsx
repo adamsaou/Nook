@@ -62,11 +62,15 @@ export function RoomView({
     });
     presenceChannel.current = channel;
 
-    channel.on("presence", { event: "sync" }, () => {
+    const recompute = () => {
       const state = channel.presenceState() as Record<string, Array<Record<string, unknown>>>;
       const list: Member[] = Object.values(state)
         .map((entries) => {
-          const p = entries[0] ?? {};
+          // A refresh can briefly leave a stale entry behind before the old
+          // connection times out — pick the most recently updated one.
+          const p = entries.reduce((a, b) =>
+            Number(b.updatedAt ?? 0) >= Number(a.updatedAt ?? 0) ? b : a,
+          );
           return {
             userId: String(p.userId ?? ""),
             username: String(p.username ?? "anon"),
@@ -76,11 +80,16 @@ export function RoomView({
         })
         .filter((m) => m.userId);
       setMembers(list);
-    });
+    };
+
+    channel
+      .on("presence", { event: "sync" }, recompute)
+      .on("presence", { event: "join" }, recompute)
+      .on("presence", { event: "leave" }, recompute);
 
     channel.subscribe((status) => {
       if (status === "SUBSCRIBED") {
-        channel.track({ userId, username, focusing: false, endsAt: null });
+        channel.track({ userId, username, focusing: false, endsAt: null, updatedAt: Date.now() });
       }
     });
 
@@ -152,9 +161,10 @@ export function RoomView({
 
   function startFocus() {
     const ends = Date.now() + DEFAULT_FOCUS_MINUTES * 60 * 1000;
+    setNow(Date.now());
     setFocusing(true);
     setEndsAt(ends);
-    presenceChannel.current?.track({ userId, username, focusing: true, endsAt: ends });
+    presenceChannel.current?.track({ userId, username, focusing: true, endsAt: ends, updatedAt: Date.now() });
   }
 
   async function endFocus(completed: boolean) {
@@ -163,7 +173,7 @@ export function RoomView({
       : Date.now();
     setFocusing(false);
     setEndsAt(null);
-    presenceChannel.current?.track({ userId, username, focusing: false, endsAt: null });
+    presenceChannel.current?.track({ userId, username, focusing: false, endsAt: null, updatedAt: Date.now() });
     await supabase.from("focus_sessions").insert({
       user_id: userId,
       room_id: roomId,
