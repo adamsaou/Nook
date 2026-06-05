@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
-import { createRoom, joinRandom, joinRoom } from "./actions";
+import { createRoom, joinByCode, joinRandom, joinRoom } from "./actions";
 import { SubmitButton } from "@/components/ui/SubmitButton";
 
 export default async function RoomsPage({
@@ -71,6 +71,13 @@ export default async function RoomsPage({
           <form action={joinRandom}>
             <Button type="submit" variant="secondary" className="w-full py-2.5">
               🎲 Join a random room
+            </Button>
+          </form>
+          <form action={joinByCode} className="flex gap-2">
+            <input name = "code" required maxLength={6} placeholder="Enter a join code" className="flex-1 rounded-lg border border-foreground/15 bg-surface px-4 py-2.5 text-sm uppercase tracking-widest outline-none focus:border-accent"
+            />
+            <Button type="submit" variant="outlined" className="py-2.5">
+              Join
             </Button>
           </form>
         </div>

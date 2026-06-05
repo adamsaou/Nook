@@ -68,3 +68,19 @@ export async function joinRandom() {
 
   redirect(`/rooms/${random.id}`);
 }
+
+export async function joinByCode(formData: FormData){
+  const supabase = await createClient();
+  const{
+    data: { user },
+  } = await supabase.auth.getUser();
+  if(!user) redirect("/login");
+
+  const code = String(formData.get("code") ?? "").trim();
+  if(!code) roomsError("Enter a join code");
+
+  const { data, error} = await supabase.rpc("join_room_by_code", {p_code: code});
+  if (error) roomsError(error.message);
+
+  redirect(`/rooms/${data}`);
+}
