@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
+import { ShareRoom } from "./ShareRoom";
 import { DEFAULT_FOCUS_MINUTES } from "@/lib/constants";
 
 type ChatMessage = {
@@ -32,12 +33,14 @@ export function RoomView({
   roomName,
   userId,
   username,
+  joinCode,
   initialMessages,
 }: {
   roomId: string;
   roomName: string;
   userId: string;
   username: string;
+  joinCode: string;
   initialMessages: ChatMessage[];
 }) {
   const supabase = useMemo(() => createClient(), []);
@@ -263,6 +266,8 @@ export function RoomView({
               )}
             </ul>
           </div>
+
+          <ShareRoom code={joinCode} />
         </div>
 
         {/* Right: chat */}

@@ -34,9 +34,11 @@ export async function proxy(request: NextRequest) {
 
   // Gate rooms behind login.
   if (!user && request.nextUrl.pathname.startsWith("/rooms")) {
+    const next = request.nextUrl.pathname + request.nextUrl.search;
     const url = request.nextUrl.clone();
     url.pathname = "/login";
-    url.searchParams.set("next", request.nextUrl.pathname);
+    url.search = "";
+    url.searchParams.set("next", next);
     return NextResponse.redirect(url);
   }
 
