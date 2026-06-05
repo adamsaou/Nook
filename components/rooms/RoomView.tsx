@@ -85,18 +85,25 @@ export function RoomView({
       setMembers(list);
     };
 
+    //Anounce leaving when the tab is closed/hidden
+    const handleHide = () => {
+      void channel.untrack();
+    };
+    window.addEventListener("pagehide", handleHide);
+
     channel
       .on("presence", { event: "sync" }, recompute)
       .on("presence", { event: "join" }, recompute)
       .on("presence", { event: "leave" }, recompute);
 
-    channel.subscribe((status) => {
+      channel.subscribe((status) => {
       if (status === "SUBSCRIBED") {
         channel.track({ userId, username, focusing: false, endsAt: null, updatedAt: Date.now() });
       }
     });
 
     return () => {
+      window.removeEventListener("pagehide", handleHide);
       supabase.removeChannel(channel);
       presenceChannel.current = null;
     };
