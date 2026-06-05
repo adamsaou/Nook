@@ -138,7 +138,11 @@ create policy "profiles_update_own" on public.profiles
 -- Rooms: public rooms visible to all; private only to members; owner manages.
 create policy "rooms_select" on public.rooms
   for select to authenticated
-  using (visibility = 'public' or public.is_room_member(id, auth.uid()));
+  using (
+    visibility = 'public'
+    or created_by = auth.uid()
+    or public.is_room_member(id, auth.uid())
+  );
 create policy "rooms_insert" on public.rooms
   for insert to authenticated with check (auth.uid() = created_by);
 create policy "rooms_update_own" on public.rooms
