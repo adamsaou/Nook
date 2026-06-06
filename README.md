@@ -4,7 +4,7 @@
 
 **A calm focus environment — start working in seconds, then focus alongside others.**
 
-🔗 **[Live demo →](https://nook-three-rosy.vercel.app/focus)**
+🔗 **[Live demo →]([https://nook-three-rosy.vercel.app/focus](https://nook-study.vercel.app))**
 
 Nook helps students and creators beat procrastination by removing friction: one tap starts a focus session, and silent **study rooms** add presence-based accountability — no gamification, no fake rewards.
 
