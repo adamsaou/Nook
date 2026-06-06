@@ -1,92 +1,77 @@
-![Lines of Code](https://img.shields.io/tokei/lines/github/adamsaou/Nook?color=16F5A3&label=lines%20of%20code)
+Nook
+A minimalist, understimulated focus ecosystem built to eliminate the friction of starting deep work.
 
-# Nook.
+🔗 Live Demo
 
-**A calm focus environment — start working in seconds, then focus alongside others.**
+🛠️ The Philosophy
+Most productivity apps are broken. They treat your brain like a slot machine—flooding you with streaks, badges, and gamified noise to keep you clicking. But when the artificial dopamine wears off, the burnout kicks in.
 
-🔗 **[Live demo →](https://nook-study.vercel.app)**
+Nook takes the opposite approach: understimulation. No fake rewards, no scrolling, no points. Just a quiet, high-signal workspace designed to help you drop into a flow state within seconds, either solo or alongside a global community.
 
-Nook helps students and creators beat procrastination by removing friction: one tap starts a focus session, and silent **study rooms** add presence-based accountability — no gamification, no fake rewards.
+✨ Features
+Instant Stateful Timer: Start a session with one tap. No login required. The timer remembers your last configuration and prompts a frictionless, single-question reflection post-session.
 
-<!-- Add a screenshot for the biggest impact:  ![Nook](docs/screenshot.png) -->
+Realtime Peer Presence: Join shared, silent co-working spaces powered by real-time database syncing. See exactly who is actively focusing alongside you without the distraction of heavy video streams.
 
----
+Ephemeral Study Rooms: Create public, private, or unlisted code-protected spaces. To keep the database clean and lightweight, empty rooms automatically self-delete.
 
-## 🧠 Vision
+Lightweight Chat: Persistent, real-time text channels embedded inside rooms for quick accountability check-ins.
 
-Most productivity tools fail because they pile on complexity, gamification, and pressure. Nook does the opposite:
+Flexible Authentication: Full row-level security (RLS) backing classic email/password sign-in alongside Google, Discord, and Slack OAuth providers.
 
-- **Zero-friction focus** — start in one tap, no setup
-- **Silent co-working** — see who's focusing, live
-- **Calm, minimal interface** — no streaks, no points, no noise
+💻 Tech Stack
+Frontend Framework: Next.js (App Router) + TypeScript
 
-> Help people start working in seconds, not minutes.
+Styling: Tailwind CSS
 
----
+Backend & Realtime: Supabase (PostgreSQL, Realtime Presence, Broadcast channels, and Row Level Security)
 
-## ✨ Features
+Deployment & Monitoring: Vercel (Hosting + Web Analytics)
 
-- ⏱️ **Instant focus timer** — solo, no login required; customizable duration that remembers your last setting, plus a quick "did this help?" reflection.
-- 🏠 **Study rooms** — create public or private rooms, join from the list, drop into a random one, or join by code.
-- 🟢 **Realtime presence** — see who's in the room and who's currently focusing, updating live.
-- 💬 **Room chat** — lightweight, persistent, real-time.
-- 🔗 **Invite by code or share link** — private rooms stay unlisted but easy to share.
-- 🔑 **Auth** — email/password plus **Google**, **Discord**, and **Slack** sign-in.
-- 🧹 **Self-cleaning rooms** — empty rooms auto-delete so the list stays fresh.
+🚀 Local Development
+Prerequisites
+Clone the repository and install dependencies:
 
----
-
-## 🛠️ Tech stack
-
-- **[Next.js](https://nextjs.org)** (App Router) + **TypeScript**
-- **Tailwind CSS** for styling
-- **[Supabase](https://supabase.com)** — Postgres, Auth, and Realtime (Presence + Postgres Changes), secured with Row Level Security
-- **[Vercel](https://vercel.com)** — hosting + Web Analytics
-
----
-
-## 🚀 Run locally
-
-```bash
+Bash
 git clone https://github.com/adamsaou/Nook.git
 cd Nook
 npm install
-```
+Environment Configuration
+Initialize a new project at supabase.com.
 
-1. **Create a Supabase project** at [supabase.com](https://supabase.com).
-2. **Add your keys** to `.env.local`:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL=https://<your-ref>.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-publishable-key>
-   ```
-3. **Run the SQL** in the Supabase SQL Editor, in order:
-   `supabase/schema.sql` → `room-cleanup.sql` → `join-room.sql` → `private-rooms.sql`
-4. **Enable auth providers** (Email, and optionally Google / Discord / Slack) in Supabase → Authentication.
-5. **Start it:**
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000).
+Create a .env.local file in the root directory and populate your keys:
 
----
+Extrait de code
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project-ref>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+Database Setup
+Run the migration scripts in your Supabase SQL Editor in the following order to set up schemas, triggers, and stored procedures:
 
-## 📁 Project structure
+supabase/schema.sql (Core database tables & RLS policies)
 
-```
+room-cleanup.sql (Cron/Function to auto-delete empty spaces)
+
+join-room.sql (RPC functions for user routing)
+
+private-rooms.sql (Access control logic)
+
+Note: Make sure to toggle on your preferred OAuth providers (Google, Discord, or Slack) within your Supabase Authentication dashboard.
+
+Spin Up the Server
+Bash
+npm run dev
+Navigate to http://localhost:3000 to view your local instance.
+
+📁 Repository Structure
 app/
-├─ (auth)/        login & signup (centered shell)
-├─ (app)/         focus, rooms, profile (shared nav + session)
-└─ auth/          OAuth callback + server actions
-components/        ui, focus, rooms, auth, shared
-lib/               supabase clients, helpers, constants
-supabase/          SQL schema, policies & functions
-docs/              project notes (vision, roadmap, rooms design)
-```
+├─ (auth)/         # Clean, centered shells for authentication flows
+├─ (app)/          # Core focus engine, workspace rooms, and user profiles
+└─ auth/           # OAuth callback routers & server actions
+components/        # Modular UI primitives, timer elements, and shared layouts
+lib/               # Supabase client initializers, hooks, and static constants
+supabase/          # Core SQL migrations, security policies, and database functions
+docs/              # Architectural notes, data modeling, and product roadmap
+📄 License
+Source-available under the PolyForm Shield License 1.0.0.
 
----
-
-## 📄 License
-
-Source-available under the **[PolyForm Shield License 1.0.0](LICENSE)**.
-
-You're welcome to read the code, run it for yourself, and contribute — but you **may not use it to build a product that competes with Nook** (e.g. running a rival hosted service). Contributions are licensed under the same terms; copyright stays with the author.
+You are free to audit the codebase, run it locally, and submit contributions. However, you may not use this software to build, host, or commercialize a competitive productivity or co-working product. Contributions are accepted under the same terms; copyright remains with the author.
