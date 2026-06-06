@@ -56,7 +56,7 @@ export default async function SprintsPage({
           Sprints<span className="text-accent">.</span>
         </h1>
         <p className="mt-1 text-foreground/60">
-          Focus on a schedule. Commit to an upcoming slot and start together.
+          Lock in at a set time with whoever shows up in silence, synchronization and together.
         </p>
       </div>
 

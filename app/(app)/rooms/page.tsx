@@ -38,7 +38,7 @@ export default async function RoomsPage({
             Study rooms<span className="text-accent">.</span>
           </h1>
           <p className="mt-1 text-foreground/60">
-            Focus alongside others. Create a room, join one, or drop into a random one.
+            Your space to focus with others; drop in anytime and stay as long as you like.
           </p>
         </div>
 
