@@ -58,7 +58,7 @@ export default async function ProfilePage() {
           <span className="text-accent">.</span>
         </h1>
         <p className="mt-1 text-foreground/60">
-          A quiet mirror of your focus — no streaks, no pressure.
+          A quiet mirror of your focus with no streaks or pressure.
         </p>
       </div>
 
