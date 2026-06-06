@@ -23,3 +23,8 @@ export const MIN_FOCUS_MINUTES = 5;
 export const MAX_FOCUS_MINUTES = 120;
 export const FOCUS_STEP_MINUTES = 5;
 export const FOCUS_PRESETS_MINUTES = [15, 25, 50] as const;
+
+// Scheduled sprints — slots open every SPRINT_SLOT_MINUTES (on the :00 / :30).
+export const SPRINT_SLOT_MINUTES = 30;
+export const SPRINT_DEFAULT_DURATION = 25;
+export const SPRINT_LOOKAHEAD = 4; // how many upcoming slots to show

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/Button";
+import { createClient } from "@/lib/supabase/client";
 import { track } from "@/lib/analytics";
 import {
   getLastDuration,
@@ -29,7 +30,8 @@ function clampMinutes(minutes: number) {
   return Math.min(MAX_FOCUS_MINUTES, Math.max(MIN_FOCUS_MINUTES, minutes));
 }
 
-export default function FocusSession() {
+export default function FocusSession({ userId }: { userId: string | null }) {
+  const supabase = useMemo(() => createClient(), []);
   const [phase, setPhase] = useState<Phase>("idle");
   const [durationMin, setDurationMin] = useState(DEFAULT_FOCUS_MINUTES);
   const [endsAt, setEndsAt] = useState<number | null>(null);
@@ -97,11 +99,19 @@ export default function FocusSession() {
   }
 
   function recordSession(reflection: FocusReflection) {
-    if (startedAt !== null && endedAt !== null) {
-      logSession({
-        startedAt,
-        endedAt,
-        plannedMinutes: durationMin,
+    if (startedAt === null || endedAt === null) return;
+
+    // Everyone gets a local log; logged-in users also persist to the cloud
+    // so it shows up in their /profile mirror.
+    logSession({ startedAt, endedAt, plannedMinutes: durationMin, completed, reflection });
+
+    if (userId) {
+      void supabase.from("focus_sessions").insert({
+        user_id: userId,
+        room_id: null,
+        planned_minutes: durationMin,
+        started_at: new Date(startedAt).toISOString(),
+        ended_at: new Date(endedAt).toISOString(),
         completed,
         reflection,
       });
