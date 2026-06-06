@@ -1,4 +1,3 @@
-```markdown
 # Nook
 
 A minimalist, understimulated focus ecosystem built to eliminate the friction of starting deep work.
@@ -41,7 +40,7 @@ Nook takes the opposite approach: **understimulation**. No fake rewards, no scro
 Clone the repository and install dependencies:
 
 ```bash
-git clone [https://github.com/adamsaou/Nook.git](https://github.com/adamsaou/Nook.git)
+git clone https://github.com/adamsaou/Nook.git
 cd Nook
 npm install
 ```
@@ -97,5 +96,3 @@ docs/              # Architectural notes, data modeling, and product roadmap
 Source-available under the **[PolyForm Shield License 1.0.0](LICENSE)**. 
 
 You are free to audit the codebase, run it locally, and submit contributions. However, you may not use this software to build, host, or commercialize a competitive productivity or co-working product. Contributions are accepted under the same terms; copyright remains with the author.
-
-```
