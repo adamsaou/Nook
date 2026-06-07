@@ -74,9 +74,12 @@ export function RoomView({
         .map((entries) => {
           // A refresh can briefly leave a stale entry behind before the old
           // connection times out — pick the most recently updated one.
-          const p = entries.reduce((a, b) =>
-            Number(b.updatedAt ?? 0) >= Number(a.updatedAt ?? 0) ? b : a,
-          );
+          const p =
+            entries.length > 0
+              ? entries.reduce((a, b) =>
+                  Number(b.updatedAt ?? 0) >= Number(a.updatedAt ?? 0) ? b : a,
+                )
+              : {};
           return {
             userId: String(p.userId ?? ""),
             username: String(p.username ?? "anon"),

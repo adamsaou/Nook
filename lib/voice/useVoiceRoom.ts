@@ -167,6 +167,9 @@ export function useVoiceRoom({
       pc.ontrack = ({ streams }) => {
         const [remoteStream] = streams;
         audio.srcObject = remoteStream;
+        audio.muted = false;
+        audio.volume = 1;
+        void audio.play().catch(() => {});
         try {
           const a = ctx.createAnalyser();
           a.fftSize = 512;
