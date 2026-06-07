@@ -17,7 +17,7 @@ export default async function RoomPage({
 
   const { data: room } = await supabase
     .from("rooms")
-    .select("id, name, visibility, created_by, join_code")
+    .select("id, name, visibility, created_by, join_code, kind")
     .eq("id", id)
     .maybeSingle();
   if (!room) notFound();
@@ -66,6 +66,7 @@ export default async function RoomPage({
       userId={user.id}
       username={profile?.username ?? "anon"}
       joinCode={room.join_code}
+      kind={room.kind}
       initialMessages={initialMessages}
     />
   );
