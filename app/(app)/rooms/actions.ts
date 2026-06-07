@@ -18,12 +18,14 @@ export async function createRoom(formData: FormData) {
   const name = String(formData.get("name") ?? "").trim();
   const visibility =
     String(formData.get("visibility") ?? "public") === "private" ? "private" : "public";
+  const kind = 
+    String(formData.get("kind") ?? "silent") === "voice" ? "voice" : "silent";
 
   if (name.length < 1) roomsError("Room name is required");
 
   const { data, error } = await supabase
     .from("rooms")
-    .insert({ name, visibility, created_by: user.id })
+    .insert({ name, visibility, kind, created_by: user.id })
     .select("id")
     .single();
   if (error) roomsError(error.message);

@@ -19,7 +19,7 @@ export default async function RoomsPage({
   const [{ data: publicRooms }, { data: memberships }] = await Promise.all([
     supabase
       .from("rooms")
-      .select("id, name, visibility, created_at")
+      .select("id, name, visibility, kind, created_at")
       .eq("visibility", "public")
       .order("created_at", { ascending: false })
       .limit(50),
@@ -64,6 +64,10 @@ export default async function RoomsPage({
               <option value="public">Public</option>
               <option value="private">Private</option>
             </select>
+            <select name="kind" defaultValue="silent" className="rounded-lg border border-foreground/15 bg-surface px-3 py-2.5 text-sm outline-none focus:border-accent">
+              <option value="silent">🔇 Silent</option>
+              <option value="voice">🎙️ Voice</option>
+            </select>
             <SubmitButton>
               Create
             </SubmitButton>
@@ -94,7 +98,14 @@ export default async function RoomsPage({
                   key={room.id}
                   className="flex items-center justify-between rounded-xl border border-foreground/10 bg-surface px-4 py-3"
                 >
-                  <span className="font-medium">{room.name}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="font-medium">{room.name}</span>
+                    {room.kind === "voice" && (
+                      <span className="rounded-full bg-accent/15 px-2 py-0.5 text-xs font-medium text-accent">
+                        🎙️ Voice
+                      </span>
+                    )}
+                  </span>
                   {myRoomIds.has(room.id) ? (
                     <Link href={`/rooms/${room.id}`}>
                       <Button variant="outlined" className="px-4 py-1.5 text-xs">
