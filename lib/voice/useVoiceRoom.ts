@@ -3,7 +3,27 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-const ICE_SERVERS: RTCIceServer[] = [{ urls: "stun:stun.l.google.com:19302" }];
+// STUN finds the direct path; TURN relays audio when a strict NAT blocks the
+// direct one (the "ICE failed" case). TURN can be your own free Metered creds
+// via env vars; otherwise it falls back to the public Open Relay project.
+const TURN_URL = process.env.NEXT_PUBLIC_TURN_URL;
+const TURN_USERNAME = process.env.NEXT_PUBLIC_TURN_USERNAME;
+const TURN_CREDENTIAL = process.env.NEXT_PUBLIC_TURN_CREDENTIAL;
+
+const ICE_SERVERS: RTCIceServer[] = [
+  { urls: "stun:stun.l.google.com:19302" },
+  TURN_URL && TURN_USERNAME && TURN_CREDENTIAL
+    ? { urls: TURN_URL, username: TURN_USERNAME, credential: TURN_CREDENTIAL }
+    : {
+        urls: [
+          "turn:openrelay.metered.ca:80",
+          "turn:openrelay.metered.ca:443",
+          "turn:openrelay.metered.ca:443?transport=tcp",
+        ],
+        username: "openrelayproject",
+        credential: "openrelayproject",
+      },
+];
 const SPEAK_THRESHOLD = 0.045;
 
 /** Max people in one voice room (mesh stays smooth up to ~6). */
