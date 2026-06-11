@@ -3,17 +3,25 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
-// STUN finds the direct path; TURN relays audio when a strict NAT blocks the
-// direct one (the "ICE failed" case). TURN can be your own free Metered creds
-// via env vars; otherwise it falls back to the public Open Relay project.
-const TURN_URL = process.env.NEXT_PUBLIC_TURN_URL;
+// STUN finds the direct path; TURN relays audio when a strict NAT blocks it
+// (the "ICE failed" case). Our self-hosted coturn relays are passed as a
+// comma-separated list of turn: URLs sharing one credential (set in Vercel env,
+// kept out of the repo so our home IP/host isn't committed). Without them we
+// fall back to the public Open Relay project.
+const TURN_URLS = process.env.NEXT_PUBLIC_TURN_URLS;
 const TURN_USERNAME = process.env.NEXT_PUBLIC_TURN_USERNAME;
 const TURN_CREDENTIAL = process.env.NEXT_PUBLIC_TURN_CREDENTIAL;
 
 const ICE_SERVERS: RTCIceServer[] = [
   { urls: "stun:stun.l.google.com:19302" },
-  TURN_URL && TURN_USERNAME && TURN_CREDENTIAL
-    ? { urls: TURN_URL, username: TURN_USERNAME, credential: TURN_CREDENTIAL }
+  TURN_URLS && TURN_USERNAME && TURN_CREDENTIAL
+    ? {
+        urls: TURN_URLS.split(",")
+          .map((u) => u.trim())
+          .filter(Boolean),
+        username: TURN_USERNAME,
+        credential: TURN_CREDENTIAL,
+      }
     : {
         urls: [
           "turn:openrelay.metered.ca:80",
