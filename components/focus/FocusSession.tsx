@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Button } from "@/components/ui/Button";
 import { createClient } from "@/lib/supabase/client";
 import { track } from "@/lib/analytics";
 import {
@@ -17,8 +16,15 @@ import {
   MAX_FOCUS_MINUTES,
   MIN_FOCUS_MINUTES,
 } from "@/lib/constants";
+import styles from "./focus.module.css";
 
 type Phase = "idle" | "running" | "done";
+
+// Ring geometry. C (circumference) drives the depleting progress arc.
+const SIZE = 240;
+const STROKE = 14;
+const R = (SIZE - STROKE) / 2;
+const C = 2 * Math.PI * R;
 
 function format(totalSeconds: number) {
   const minutes = Math.floor(totalSeconds / 60);
@@ -74,6 +80,7 @@ export default function FocusSession({ userId }: { userId: string | null }) {
   function changeDuration(next: number) {
     const minutes = clampMinutes(next);
     setDurationMin(minutes);
+    setRemaining(minutes * 60);
     setLastDuration(minutes);
   }
 
@@ -138,88 +145,120 @@ export default function FocusSession({ userId }: { userId: string | null }) {
     toIdle();
   }
 
+  const total = durationMin * 60;
+  const progress = phase === "running" ? Math.max(0, Math.min(1, remaining / total)) : 1;
+  const dashoffset = C * (1 - progress);
+
   return (
-    <main className="flex flex-1 items-center justify-center p-6">
-        <div className="flex w-full max-w-md flex-col items-center gap-8 rounded-3xl border border-foreground/10 bg-surface px-8 py-14 text-center shadow-sm">
-          {phase === "idle" && (
-            <>
-              <div className="font-mono text-7xl font-semibold tabular-nums">
-                {format(durationMin * 60)}
-              </div>
+    <main className={styles.wrap}>
+      <div className={styles.grain} />
 
-              <div className="flex flex-col items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => changeDuration(durationMin - FOCUS_STEP_MINUTES)}
-                    className="h-9 w-9 rounded-full border border-foreground/20 text-lg leading-none hover:bg-foreground/5"
-                    aria-label="Decrease duration"
-                  >
-                    –
-                  </button>
-                  <div className="flex gap-2">
-                    {FOCUS_PRESETS_MINUTES.map((preset) => (
-                      <button
-                        key={preset}
-                        onClick={() => changeDuration(preset)}
-                        className={`rounded-full px-3 py-1 text-sm font-medium transition ${
-                          durationMin === preset
-                            ? "bg-foreground text-background"
-                            : "border border-foreground/20 hover:bg-foreground/5"
-                        }`}
-                      >
-                        {preset}m
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => changeDuration(durationMin + FOCUS_STEP_MINUTES)}
-                    className="h-9 w-9 rounded-full border border-foreground/20 text-lg leading-none hover:bg-foreground/5"
-                    aria-label="Increase duration"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
+      <div className={styles.card}>
+        <div className={styles.ringWrap}>
+          {phase === "running" && <div className={styles.glow} aria-hidden="true" />}
+          <svg className={styles.ring} viewBox={`0 0 ${SIZE} ${SIZE}`} aria-hidden="true">
+            <circle
+              className={styles.track}
+              cx={SIZE / 2}
+              cy={SIZE / 2}
+              r={R}
+              strokeWidth={STROKE}
+              fill="none"
+            />
+            <circle
+              className={styles.progress}
+              cx={SIZE / 2}
+              cy={SIZE / 2}
+              r={R}
+              strokeWidth={STROKE}
+              fill="none"
+              strokeLinecap="round"
+              strokeDasharray={C}
+              strokeDashoffset={dashoffset}
+            />
+          </svg>
 
-              <Button variant="primary" onClick={start} className="px-10 py-4 text-base">
-                Start Focus
-              </Button>
-            </>
-          )}
-
-          {phase === "running" && (
-            <>
-              <div className="font-mono text-7xl font-semibold tabular-nums sm:text-8xl">
-                {format(remaining)}
-              </div>
-              <Button variant="outlined" onClick={() => finish(false)}>
-                End session
-              </Button>
-            </>
-          )}
-
-          {phase === "done" && (
-            <>
-              <div className="flex flex-col gap-2">
-                <h1 className="text-4xl font-extrabold tracking-tight">
-                  Nice work<span className="text-accent">.</span>
-                </h1>
-                <p className="text-foreground/60">Did this help you start?</p>
-              </div>
-              <div className="flex gap-3">
-                <Button variant="outlined" onClick={() => reflect(true)}>
-                  👍 Yes
-                </Button>
-                <Button variant="outlined" onClick={() => reflect(false)}>
-                  👎 No
-                </Button>
-              </div>
-              <Button variant="secondary" onClick={startAnother}>
-                Start another
-              </Button>
-            </>
-          )}
+          <div className={styles.center}>
+            {phase === "done" ? (
+              <span className={styles.check}>✓</span>
+            ) : (
+              <span className={styles.time}>
+                {format(phase === "running" ? remaining : total)}
+              </span>
+            )}
+            <span className={styles.phaseLabel}>
+              {phase === "idle" ? "ready" : phase === "running" ? "focusing" : "complete"}
+            </span>
+          </div>
         </div>
+
+        {phase === "idle" && (
+          <div className={styles.controls}>
+            <div className={styles.stepper}>
+              <button
+                onClick={() => changeDuration(durationMin - FOCUS_STEP_MINUTES)}
+                className={styles.step}
+                aria-label="Decrease duration"
+              >
+                –
+              </button>
+              <div className={styles.presets}>
+                {FOCUS_PRESETS_MINUTES.map((preset) => (
+                  <button
+                    key={preset}
+                    onClick={() => changeDuration(preset)}
+                    className={`${styles.preset} ${
+                      durationMin === preset ? styles.presetActive : ""
+                    }`}
+                  >
+                    {preset}m
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => changeDuration(durationMin + FOCUS_STEP_MINUTES)}
+                className={styles.step}
+                aria-label="Increase duration"
+              >
+                +
+              </button>
+            </div>
+            <button onClick={start} className={styles.primary}>
+              Start focus
+            </button>
+          </div>
+        )}
+
+        {phase === "running" && (
+          <div className={styles.controls}>
+            <button onClick={() => finish(false)} className={styles.ghost}>
+              End session
+            </button>
+          </div>
+        )}
+
+        {phase === "done" && (
+          <div className={styles.controls}>
+            <div style={{ textAlign: "center" }}>
+              <h1 className={styles.doneTitle}>
+                Nice work<span className={styles.dot}>.</span>
+              </h1>
+              <p className={styles.doneSub}>Did this help you start?</p>
+            </div>
+            <div className={styles.row}>
+              <button onClick={() => reflect(true)} className={styles.ghost}>
+                👍 Yes
+              </button>
+              <button onClick={() => reflect(false)} className={styles.ghost}>
+                👎 No
+              </button>
+            </div>
+            <button onClick={startAnother} className={styles.primary}>
+              Start another
+            </button>
+          </div>
+        )}
+      </div>
     </main>
   );
 }
