@@ -41,3 +41,31 @@ body::before {
   -webkit-mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 0%, transparent 80%);
   mask-image: radial-gradient(ellipse 75% 75% at 50% 45%, #000 0%, transparent 80%);
 }
+
+/* ---- Calm page transitions (View Transitions API) ----
+   Soft cross-fade on navigation. Falls back to an instant swap where the
+   browser doesn't support it, so the app works either way. */
+::view-transition-group(*),
+::view-transition-old(*),
+::view-transition-new(*) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Anchor the nav so it stays put while the page content transitions. */
+::view-transition-group(app-nav) {
+  animation: none;
+}
+::view-transition-old(app-nav) {
+  display: none;
+}
+
+/* Calm tech: respect people who ask for less motion. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+  }
+}

@@ -1,0 +1,315 @@
+/* Landing page — "Nook Riso" (paper & risograph).
+   Ported from the Claude Design generation; scoped to this page.
+   Reuses the global brand tokens from styles/globals.css. */
+
+.page {
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  z-index: 2;
+}
+
+/* Very subtle paper grain over the whole page */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Nav */
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 30px;
+}
+.markSm {
+  font-size: 21px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.markSm .dot {
+  color: var(--accent);
+}
+.login {
+  font-size: 14px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.55);
+  text-decoration: none;
+  padding: 8px 4px;
+  transition: color 0.2s var(--ease);
+}
+.login:hover {
+  color: #000;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: 40px;
+  padding: 74px 0 92px;
+}
+/* Halftone dot field behind the hero, faded toward the edges */
+.halftone {
+  position: absolute;
+  inset: -60px -120px -40px -120px;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1.6px);
+  background-size: 24px 24px;
+  -webkit-mask-image: radial-gradient(ellipse 62% 70% at 42% 48%, #000 0%, transparent 78%);
+  mask-image: radial-gradient(ellipse 62% 70% at 42% 48%, #000 0%, transparent 78%);
+}
+
+.eyebrow {
+  font-size: 12.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  color: rgba(0, 0, 0, 0.45);
+  margin: 0 0 26px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.eyebrow::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(22, 245, 163, 0.18);
+}
+
+/* Offset wordmark — riso misregistration */
+.wordmark {
+  position: relative;
+  display: inline-block;
+  font-size: clamp(76px, 11vw, 148px);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  margin: 0 0 24px;
+}
+.wordmark .ghost {
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: var(--accent);
+  transform: translate(-2.5px, 2.5px);
+  z-index: 0;
+  user-select: none;
+}
+.wordmark .key {
+  position: relative;
+  z-index: 1;
+  color: #000;
+}
+.wordmark .pdot {
+  color: var(--accent);
+}
+
+.tagline {
+  font-size: clamp(19px, 2.1vw, 23px);
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.6);
+  max-width: 30ch;
+  margin: 0 0 40px;
+  text-wrap: balance;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.btn {
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 15px;
+  border-radius: 9999px;
+  padding: 15px 30px;
+  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+.btnPrimary {
+  background: var(--accent);
+  color: #000;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(22, 245, 163, 0.32);
+}
+.btnPrimary .arr {
+  transition: transform 0.25s var(--ease);
+}
+.btnPrimary:hover .arr {
+  transform: translateX(3px);
+}
+.btnGhost {
+  background: transparent;
+  color: rgba(0, 0, 0, 0.72);
+  padding: 15px 14px;
+}
+.btnGhost:hover {
+  color: #000;
+}
+.btnGhost .arr {
+  color: var(--accent);
+}
+
+/* Illustration */
+.art {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.art svg {
+  width: 100%;
+  max-width: 430px;
+  height: auto;
+}
+
+/* Cards */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 8px 0 110px;
+}
+.card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid rgba(0, 0, 0, 0.09);
+  border-radius: 22px;
+  padding: 26px 26px 28px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(22, 245, 163, 0.45);
+  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.07);
+}
+.cardAccent {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 20px;
+  background-image: radial-gradient(circle, var(--accent) 1.4px, transparent 1.8px);
+  background-size: 8px 8px;
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 55%, transparent 72%);
+  mask-image: radial-gradient(circle at 50% 50%, #000 55%, transparent 72%);
+}
+.card h3 {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 7px;
+}
+.card h3 .dot {
+  color: var(--accent);
+}
+.card p {
+  font-size: 14.5px;
+  color: rgba(0, 0, 0, 0.55);
+  margin: 0;
+  text-wrap: pretty;
+}
+
+/* Entrance: "ink settling" blur-bleed. Opacity stays 1 the whole time, so
+   content is always visible; only a gentle translate + blur resolves into
+   registration. */
+@media (prefers-reduced-motion: no-preference) {
+  .settle {
+    animation: settle 0.85s var(--ease) backwards;
+  }
+  .d1 {
+    animation-delay: 0.04s;
+  }
+  .d2 {
+    animation-delay: 0.12s;
+  }
+  .d3 {
+    animation-delay: 0.2s;
+  }
+  .d4 {
+    animation-delay: 0.28s;
+  }
+  .d5 {
+    animation-delay: 0.36s;
+  }
+  .d6 {
+    animation-delay: 0.46s;
+  }
+  @keyframes settle {
+    from {
+      transform: translateY(10px);
+      filter: blur(5px);
+    }
+    to {
+      transform: none;
+      filter: blur(0);
+    }
+  }
+  /* green print-offset settles into registration on first load */
+  .wordmark .ghost {
+    animation: reg 0.9s var(--ease) 0.12s backwards;
+  }
+  @keyframes reg {
+    from {
+      transform: translate(-9px, 9px);
+    }
+    to {
+      transform: translate(-2.5px, 2.5px);
+    }
+  }
+}
+
+/* Responsive */
+@media (max-width: 880px) {
+  .wrap {
+    padding: 0 26px;
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 48px 0 64px;
+  }
+  .art {
+    order: -1;
+    margin-bottom: 14px;
+  }
+  .art svg {
+    max-width: 300px;
+  }
+  .halftone {
+    inset: -40px -60px;
+  }
+  .cards {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding-bottom: 80px;
+  }
+  .tagline {
+    max-width: 34ch;
+  }
+}

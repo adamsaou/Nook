@@ -1,0 +1,39 @@
+<!-- @dsCard group="Brand" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nook — Colors</title>
+<style>
+  :root { --background:#fff8e7; --foreground:#000; --accent:#16f5a3; --surface:#fff; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:48px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--background); color:var(--foreground);
+    background-image:radial-gradient(70% 55% at 50% -5%, rgba(22,245,163,.12), transparent 65%);
+    background-repeat:no-repeat;
+  }
+  .eyebrow { font-size:12px; text-transform:uppercase; letter-spacing:.2em; color:rgba(0,0,0,.4); margin:0 0 6px; }
+  h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0 0 28px; }
+  .dot { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; max-width:600px; }
+  .swatch { border:1px solid rgba(0,0,0,.1); border-radius:18px; overflow:hidden; background:#fff; box-shadow:0 1px 2px rgba(0,0,0,.05); }
+  .chip { height:104px; }
+  .meta { padding:14px 16px; }
+  .name { font-weight:600; font-size:15px; }
+  .hex { font-family:ui-monospace,"SF Mono",monospace; font-size:12px; color:rgba(0,0,0,.5); margin-top:3px; }
+</style>
+</head>
+<body>
+  <p class="eyebrow">Foundations</p>
+  <h1>Brand colors<span class="dot">.</span></h1>
+  <div class="grid">
+    <div class="swatch"><div class="chip" style="background:#fff8e7"></div><div class="meta"><div class="name">Cream</div><div class="hex">#FFF8E7 · background</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#000"></div><div class="meta"><div class="name">Black</div><div class="hex">#000000 · foreground</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#16f5a3"></div><div class="meta"><div class="name">Accent Green</div><div class="hex">#16F5A3 · accent</div></div></div>
+    <div class="swatch"><div class="chip" style="background:#fff;border-bottom:1px solid rgba(0,0,0,.07)"></div><div class="meta"><div class="name">White</div><div class="hex">#FFFFFF · surface</div></div></div>
+  </div>
+</body>
+</html>

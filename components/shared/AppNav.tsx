@@ -13,7 +13,10 @@ const LINKS = [
 /** Shared, auth-aware top navigation for the app pages. */
 export function AppNav({ username }: { username?: string | null }) {
   return (
-    <header className="flex items-center justify-between px-6 py-4 sm:px-10">
+    <header
+      style={{ viewTransitionName: "app-nav" }}
+      className="flex items-center justify-between px-6 py-4 sm:px-10"
+    >
       <div className="flex items-center gap-6">
         <Wordmark />
         <nav className="hidden items-center gap-4 text-sm text-foreground/60 sm:flex">

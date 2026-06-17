@@ -1,0 +1,51 @@
+<!-- @dsCard group="Components" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nook — Cards</title>
+<style>
+  :root { --background:#fff8e7; --foreground:#000; --accent:#16f5a3; --surface:#fff; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; padding:48px;
+    font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    background:var(--background); color:var(--foreground);
+    background-image:radial-gradient(70% 55% at 50% -5%, rgba(22,245,163,.12), transparent 65%);
+    background-repeat:no-repeat;
+  }
+  .eyebrow { font-size:12px; text-transform:uppercase; letter-spacing:.2em; color:rgba(0,0,0,.4); margin:0 0 6px; }
+  h1 { font-size:24px; font-weight:800; letter-spacing:-.02em; margin:0 0 28px; }
+  .dot { color:var(--accent); }
+  .grid { display:grid; grid-template-columns:repeat(2,1fr); gap:18px; max-width:640px; }
+  .card { border:1px solid rgba(0,0,0,.1); border-radius:18px; background:var(--surface); padding:22px; box-shadow:0 1px 2px rgba(0,0,0,.05); display:flex; flex-direction:column; gap:8px; }
+  .card.hover { transform:translateY(-3px); border-color:rgba(22,245,163,.4); box-shadow:0 10px 24px rgba(0,0,0,.08); }
+  .title { font-size:16px; font-weight:600; }
+  .blurb { font-size:14px; color:rgba(0,0,0,.55); }
+  .open { font-size:14px; font-weight:600; color:var(--accent); margin-top:4px; }
+  .state { font-size:11px; text-transform:uppercase; letter-spacing:.12em; color:rgba(0,0,0,.3); margin-bottom:8px; font-family:ui-monospace,monospace; }
+</style>
+</head>
+<body>
+  <p class="eyebrow">Components</p>
+  <h1>Cards<span class="dot">.</span></h1>
+  <div class="grid">
+    <div>
+      <p class="state">Rest</p>
+      <div class="card">
+        <div class="title">Focus<span class="dot">.</span></div>
+        <div class="blurb">A calm solo timer to lock into deep work, one session at a time.</div>
+      </div>
+    </div>
+    <div>
+      <p class="state">Hover</p>
+      <div class="card hover">
+        <div class="title">Rooms<span class="dot">.</span></div>
+        <div class="blurb">Study with your people in silent or voice rooms. Drop in anytime.</div>
+        <div class="open">Open →</div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

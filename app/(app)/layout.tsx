@@ -1,3 +1,4 @@
+import { ViewTransition } from "react";
 import { createClient } from "@/lib/supabase/server";
 import { AppNav } from "@/components/shared/AppNav";
 
@@ -25,7 +26,7 @@ export default async function AppLayout({
   return (
     <div className="flex flex-1 flex-col">
       <AppNav username={username} />
-      {children}
+      <ViewTransition>{children}</ViewTransition>
     </div>
   );
 }
