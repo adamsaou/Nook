@@ -18,7 +18,7 @@ export function AppNav({ username }: { username?: string | null }) {
       className="flex items-center justify-between px-6 py-4 sm:px-10"
     >
       <div className="flex items-center gap-6">
-        <Wordmark />
+        <Wordmark href="/focus" />
         <nav className="hidden items-center gap-4 text-sm text-foreground/60 sm:flex">
           {LINKS.map((l) => (
             <Link key={l.href} href={l.href} className="transition-colors hover:text-foreground">

@@ -2,7 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 // Next 16 renamed `middleware` -> `proxy`. This refreshes the Supabase session
-// on every matched request and gates /rooms behind authentication.
+// on every matched request and gates the whole app behind authentication.
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -32,9 +32,16 @@ export async function proxy(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Gate rooms behind login.
-  if (!user && request.nextUrl.pathname.startsWith("/rooms")) {
-    const next = request.nextUrl.pathname + request.nextUrl.search;
+  // Gate the whole app behind login. The marketing landing, auth pages, and the
+  // OAuth callback (which runs before a session exists) stay public; everything
+  // in the (app) group requires a session.
+  const PROTECTED = ["/focus", "/sprints", "/rooms", "/profile"];
+  const { pathname } = request.nextUrl;
+  const needsAuth = PROTECTED.some(
+    (p) => pathname === p || pathname.startsWith(p + "/"),
+  );
+  if (!user && needsAuth) {
+    const next = pathname + request.nextUrl.search;
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     url.search = "";
