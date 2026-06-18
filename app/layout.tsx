@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Gochi_Hand } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "../styles/globals.css";
 import { APP_NAME, APP_DESCRIPTION } from "@/lib/constants";
@@ -11,6 +11,13 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// Hand-drawn marker face for headings (Nook Riso notebook direction).
+const gochiHand = Gochi_Hand({
+  variable: "--font-hand",
+  weight: "400",
   subsets: ["latin"],
 });
 
@@ -27,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${gochiHand.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

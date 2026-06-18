@@ -1,28 +1,19 @@
-/* Landing page — "Nook Riso" (paper & risograph).
-   Ported from the Claude Design generation; scoped to this page.
-   Reuses the global brand tokens from styles/globals.css. */
+/* Landing — "Nook Riso" hand-drawn notebook. Scoped to this page.
+   Ruled paper + grain come globally from styles/globals.css; the marker
+   heading face is var(--font-hand). */
 
 .page {
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
   position: relative;
   z-index: 2;
 }
-
-/* Very subtle paper grain over the whole page */
-.grain {
-  position: fixed;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  opacity: 0.04;
-  mix-blend-mode: multiply;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-
 .wrap {
   max-width: 1180px;
   margin: 0 auto;
   padding: 0 40px;
+}
+.dot {
+  color: var(--accent);
 }
 
 /* Nav */
@@ -33,12 +24,8 @@
   padding-top: 30px;
 }
 .markSm {
-  font-size: 21px;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
-.markSm .dot {
-  color: var(--accent);
+  font-family: var(--font-hand), system-ui, cursive;
+  font-size: 25px;
 }
 .login {
   font-size: 14px;
@@ -61,18 +48,6 @@
   gap: 40px;
   padding: 74px 0 92px;
 }
-/* Halftone dot field behind the hero, faded toward the edges */
-.halftone {
-  position: absolute;
-  inset: -60px -120px -40px -120px;
-  z-index: -1;
-  pointer-events: none;
-  background-image: radial-gradient(circle, rgba(0, 0, 0, 0.07) 1px, transparent 1.6px);
-  background-size: 24px 24px;
-  -webkit-mask-image: radial-gradient(ellipse 62% 70% at 42% 48%, #000 0%, transparent 78%);
-  mask-image: radial-gradient(ellipse 62% 70% at 42% 48%, #000 0%, transparent 78%);
-}
-
 .eyebrow {
   font-size: 12.5px;
   text-transform: uppercase;
@@ -93,13 +68,14 @@
   box-shadow: 0 0 0 4px rgba(22, 245, 163, 0.18);
 }
 
-/* Offset wordmark — riso misregistration */
+/* Hand-drawn wordmark with green misregistration */
 .wordmark {
   position: relative;
   display: inline-block;
+  font-family: var(--font-hand), system-ui, cursive;
   font-size: clamp(76px, 11vw, 148px);
-  font-weight: 800;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  letter-spacing: -0.01em;
   line-height: 0.92;
   margin: 0 0 24px;
 }
@@ -120,6 +96,14 @@
 .wordmark .pdot {
   color: var(--accent);
 }
+.spark {
+  position: absolute;
+  top: -6px;
+  right: -30px;
+  width: 38px;
+  height: 38px;
+  z-index: 2;
+}
 
 .tagline {
   font-size: clamp(19px, 2.1vw, 23px);
@@ -130,6 +114,7 @@
   text-wrap: balance;
 }
 
+/* Actions */
 .actions {
   display: flex;
   align-items: center;
@@ -137,6 +122,7 @@
   flex-wrap: wrap;
 }
 .btn {
+  position: relative;
   border: none;
   cursor: pointer;
   font-family: inherit;
@@ -144,7 +130,7 @@
   font-size: 15px;
   border-radius: 9999px;
   padding: 15px 30px;
-  transition: transform 0.2s var(--ease), box-shadow 0.2s var(--ease), background 0.2s var(--ease);
+  transition: transform 0.2s var(--ease);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -153,13 +139,15 @@
 .btnPrimary {
   background: var(--accent);
   color: #000;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+}
+.btnPrimary > *:not(.frame) {
+  position: relative;
+  z-index: 1;
 }
 .btnPrimary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 26px rgba(22, 245, 163, 0.32);
+  transform: translateY(-2px) rotate(-0.5deg);
 }
-.btnPrimary .arr {
+.arr {
   transition: transform 0.25s var(--ease);
 }
 .btnPrimary:hover .arr {
@@ -168,13 +156,35 @@
 .btnGhost {
   background: transparent;
   color: rgba(0, 0, 0, 0.72);
-  padding: 15px 14px;
+  padding: 15px 6px;
 }
 .btnGhost:hover {
   color: #000;
 }
 .btnGhost .arr {
   color: var(--accent);
+}
+.u {
+  position: absolute;
+  left: 6px;
+  right: 6px;
+  bottom: 8px;
+  height: 7px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q30 1 60 4 T118 3' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+    center/100% 100% no-repeat;
+  opacity: 0.8;
+}
+
+/* Hand-drawn frame layer (button + cards) */
+.frame {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  overflow: visible;
+  color: #000;
 }
 
 /* Illustration */
@@ -198,35 +208,29 @@
 }
 .card {
   position: relative;
-  background: var(--surface);
-  border: 1px solid rgba(0, 0, 0, 0.09);
+  background: #fff;
+  border: none;
   border-radius: 22px;
-  padding: 26px 26px 28px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
-  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), border-color 0.25s var(--ease);
+  padding: 28px 28px 30px;
+  transition: transform 0.25s var(--ease);
+}
+.card > *:not(.frame) {
+  position: relative;
+  z-index: 1;
 }
 .card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(22, 245, 163, 0.45);
-  box-shadow: 0 14px 30px rgba(0, 0, 0, 0.07);
+  transform: translateY(-3px) rotate(-0.4deg);
 }
-.cardAccent {
-  width: 30px;
-  height: 30px;
-  margin-bottom: 20px;
-  background-image: radial-gradient(circle, var(--accent) 1.4px, transparent 1.8px);
-  background-size: 8px 8px;
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 55%, transparent 72%);
-  mask-image: radial-gradient(circle at 50% 50%, #000 55%, transparent 72%);
+.doodle {
+  width: 46px;
+  height: 46px;
+  margin-bottom: 18px;
+  display: block;
 }
-.card h3 {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.cardTitle {
+  font-family: var(--font-hand), system-ui, cursive;
+  font-size: 23px;
   margin: 0 0 7px;
-}
-.card h3 .dot {
-  color: var(--accent);
 }
 .card p {
   font-size: 14.5px;
@@ -235,9 +239,7 @@
   text-wrap: pretty;
 }
 
-/* Entrance: "ink settling" blur-bleed. Opacity stays 1 the whole time, so
-   content is always visible; only a gentle translate + blur resolves into
-   registration. */
+/* Entrance: "ink settling" blur-bleed */
 @media (prefers-reduced-motion: no-preference) {
   .settle {
     animation: settle 0.85s var(--ease) backwards;
@@ -270,7 +272,6 @@
       filter: blur(0);
     }
   }
-  /* green print-offset settles into registration on first load */
   .wordmark .ghost {
     animation: reg 0.9s var(--ease) 0.12s backwards;
   }
@@ -300,9 +301,6 @@
   }
   .art svg {
     max-width: 300px;
-  }
-  .halftone {
-    inset: -40px -60px;
   }
   .cards {
     grid-template-columns: 1fr;
