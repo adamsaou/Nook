@@ -57,3 +57,16 @@ Dense dashboards. Multiple bright CTAs. Harsh contrast. Loud badges. Spinners th
 
 ## Reference anchors
 Things 3, Linear, Arc / Raycast, Stripe / Apple, Headspace / Calm. Foundation: Vercel / Geist (already our font). Philosophy: calmtech.com (Amber Case).
+
+## Brand model
+- **Essence:** Focus, made effortless.
+- **Mission:** Make starting focus effortless and staying focused natural — for anyone, anywhere, without the noise.
+- **Vision:** A calmer relationship with focus; one calm focus layer across every device (cross-platform ecosystem = north star; web MVP = today's wedge).
+- **Positioning:** For anyone fighting distraction, Nook is a calm focus ecosystem that removes the friction of starting and helps you stay in flow — unlike noisy apps built to steal attention, or the lonely grind of focusing alone.
+- **Audience:** Anyone fighting distraction (students, remote workers, makers) — united by wanting to focus, easily.
+- **Tension / antidote:** the attention economy (noisy, addictive apps) + the friction & loneliness of focusing alone.
+- **Personality:** calm, warm, frictionless, human — a quiet companion that gets out of your way. Cozy/hand-drawn, never clinical; encouraging, never pushy.
+- **Promise:** From scattered to focused in seconds, and focused for longer.
+- **Principles:** (1) lowest friction to focus; (2) calm by default (calm tech); (3) focus is better shared; (4) everywhere you are; (5) respect attention & effort (no guilt, no pressure-streaks, no dark patterns).
+- **Voice:** calm, warm, plain, gently encouraging; short sentences; no hype/hustle/guilt; like a kind friend, not a productivity coach. No em dashes.
+- **Tagline candidates:** Focus, made effortless. / Slip into focus. / A calm corner to focus.

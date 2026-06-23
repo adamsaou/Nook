@@ -1,0 +1,859 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Nook Pitch Deck (RallyAI)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Gochi+Hand&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #fff8e7; --fg: #000; --accent: #16f5a3; --surface: #fff;
+    --hand: "Gochi Hand", "Geist", system-ui, cursive;
+    --sans: "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --muted: rgba(0,0,0,.55); --faint: rgba(0,0,0,.4);
+    --line: rgba(0,0,0,.12);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; height: 100%; }
+  body { font-family: var(--sans); color: var(--fg); }
+
+  /* ---- stage: dark canvas, slide scaled to fit ---- */
+  .stage { position: fixed; inset: 0; background: #14130e; overflow: hidden; }
+  .slides {
+    position: absolute; top: 50%; left: 50%;
+    width: 1280px; height: 720px;
+    transform: translate(-50%, -50%); transform-origin: center center;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    opacity: 0; pointer-events: none; transition: opacity .4s ease;
+    display: flex; flex-direction: column;
+    padding: 80px 84px 88px;
+    background: var(--bg);
+    background-image: linear-gradient(rgba(0,0,0,.05) 1px, transparent 1px);
+    background-size: 100% 40px;
+    overflow: hidden;
+  }
+  .slide.active { opacity: 1; pointer-events: auto; }
+  .slide::before {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background-image:
+      radial-gradient(60% 45% at 50% -8%, rgba(22,245,163,.13), transparent 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+  }
+  .slide > * { position: relative; z-index: 1; }
+
+  /* ---- type system ---- */
+  .kicker { font-size: 13px; text-transform: uppercase; letter-spacing: .24em; font-weight: 600; color: var(--faint); display: inline-flex; align-items: center; gap: 10px; }
+  .kicker::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
+  .kicker.apx::before { background: var(--faint); }
+  h2 { font-family: var(--hand); font-weight: 400; font-size: 66px; line-height: .98; margin: 14px 0 0; }
+  .dot { color: var(--accent); }
+  .lead { font-size: 24px; color: var(--muted); line-height: 1.4; }
+  .src { font-size: 12.5px; color: rgba(0,0,0,.42); margin-top: 18px; }
+  .src em { font-style: italic; }
+  .hl { color: #000; font-weight: 600; }
+
+  /* hand-drawn green underline accent */
+  .uline { position: relative; white-space: nowrap; }
+  .uline::after { content: ""; position: absolute; left: 0; right: -2px; bottom: -10px; height: 9px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 8' preserveAspectRatio='none'%3E%3Cpath d='M2 5 Q30 1 60 4 T118 3' fill='none' stroke='%2316f5a3' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E") center/100% 100% no-repeat; }
+
+  .grow { flex: 1; }
+  .split { display: flex; gap: 56px; flex: 1; align-items: center; }
+  .mid { display: flex; flex-direction: column; justify-content: center; }
+  ul.clean { list-style: none; padding: 0; margin: 0; }
+  ul.clean li { font-size: 21px; margin: 0 0 16px; padding-left: 32px; position: relative; line-height: 1.32; }
+  ul.clean li:last-child { margin-bottom: 0; }
+  ul.clean li::before { content: "→"; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
+  .quote { font-family: var(--hand); font-size: 42px; line-height: 1.15; color: #000; }
+
+  /* big stats */
+  .stats { display: flex; gap: 0; flex: 1; align-items: center; }
+  .stat { flex: 1; padding: 0 34px; }
+  .stat + .stat { border-left: 1px solid var(--line); }
+  .stat b { font-family: var(--hand); font-weight: 400; font-size: 76px; line-height: 1; display: block; }
+  .stat span { font-size: 18px; color: var(--muted); display: block; margin-top: 14px; line-height: 1.35; }
+
+  /* cards w/ hand frame */
+  .card { position: relative; background: var(--surface); border-radius: 18px; padding: 22px 24px; }
+  .frame { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+  .card > *:not(.frame) { position: relative; }
+  .card h3 { font-family: var(--hand); font-weight: 400; font-size: 27px; margin: 4px 0 6px; }
+  .card p { margin: 0; font-size: 15px; color: var(--muted); line-height: 1.42; }
+  .doodle { width: 38px; height: 38px; display: block; }
+  .sci { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 1; align-content: center; }
+  .sci .card p { font-size: 17px; color: #111; }
+  .sci .by { font-size: 13px; color: var(--accent); font-weight: 600; margin-top: 7px; display: block; }
+
+  /* flywheel */
+  .flywheel { display: flex; flex-direction: column; gap: 8px; align-items: center; }
+  .fly { background: var(--surface); border: 2px solid #000; border-radius: 999px; padding: 11px 26px; font-weight: 600; font-size: 18px; }
+  .fly.accent { background: var(--accent); }
+  .arrow { color: var(--accent); font-size: 20px; line-height: .6; }
+
+  /* focus ring (animated live, frozen in PDF) */
+  .fring { position: relative; width: 300px; height: 300px; }
+  .fring > svg { transform: rotate(-90deg); }
+  .fring .glow { position: absolute; inset: 14%; border-radius: 50%; background: radial-gradient(circle, rgba(22,245,163,.34), transparent 68%); filter: blur(9px); animation: breathe 4.5s ease-in-out infinite; }
+  .fring .track { stroke: rgba(0,0,0,.08); }
+  .fring .prog { stroke: var(--accent); stroke-linecap: round; }
+  .fring .t { position: absolute; inset: 0; display: grid; place-items: center; font-size: 56px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  @keyframes breathe { 0%,100% { transform: scale(.94); opacity: .5; } 50% { transform: scale(1.06); opacity: .95; } }
+
+  /* title illustration: a living scene — pulsing sun + rising steam */
+  .sun-glow { transform-box: fill-box; transform-origin: center; animation: sunpulse 3.6s ease-in-out infinite; }
+  .sun-rays { transform-box: fill-box; transform-origin: center; animation: raystwinkle 3.6s ease-in-out infinite; }
+  @keyframes sunpulse { 0%, 100% { transform: scale(1); opacity: .16; } 50% { transform: scale(1.24); opacity: .44; } }
+  @keyframes raystwinkle { 0%, 100% { opacity: .5; transform: scale(1); } 50% { opacity: 1; transform: scale(1.07); } }
+  .steam { transform-box: fill-box; transform-origin: center bottom; }
+  .steam-a { animation: steam 3.4s ease-in-out infinite; }
+  .steam-b { animation: steam 3.4s ease-in-out 1s infinite; }
+  @keyframes steam {
+    0% { opacity: .1; transform: translateY(5px) scaleY(.8); }
+    50% { opacity: .95; transform: translateY(-9px) scaleY(1.14); }
+    100% { opacity: .1; transform: translateY(5px) scaleY(.8); }
+  }
+
+  /* studying figure — writes while the timer runs, stops when it ends */
+  .studier .head { transform-box: fill-box; transform-origin: bottom center; transition: transform .5s ease; }
+  .studier .arm { transition: transform .5s ease; }
+  .studier .pencil { transform-box: fill-box; transform-origin: top center; }
+  .studying .head { animation: bob 2.6s ease-in-out infinite; }
+  .studying .pencil { animation: write .5s ease-in-out infinite; }
+  @keyframes write { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
+  @keyframes bob { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(2px) rotate(2deg); } }
+  .done .arm { transform: translateY(-9px); }
+  .done .head { transform: translateY(-3px) rotate(-13deg); }
+
+  /* ---- product mock windows (Solution) ---- */
+  .mocks { display: flex; gap: 22px; flex: 1; align-items: stretch; margin-top: 16px; }
+  .winwrap { flex: 1; display: flex; flex-direction: column; }
+  .win { flex: 1; background: var(--surface); border-radius: 16px; border: 1px solid rgba(0,0,0,.08); box-shadow: 0 12px 30px rgba(0,0,0,.09); overflow: hidden; display: flex; flex-direction: column; }
+  .win .bar { height: 28px; background: rgba(0,0,0,.035); display: flex; align-items: center; gap: 6px; padding: 0 12px; border-bottom: 1px solid rgba(0,0,0,.06); flex: none; }
+  .win .bar i { width: 9px; height: 9px; border-radius: 50%; background: rgba(0,0,0,.14); }
+  .win .body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 9px; padding: 14px; text-align: center; }
+  .wlabel { font-family: var(--hand); font-size: 25px; text-align: center; margin-top: 10px; }
+  .wtitle { font-size: 15px; font-weight: 600; }
+  .wsub { font-size: 12.5px; color: var(--muted); }
+  .avrow { display: flex; gap: 9px; justify-content: center; }
+  .av { width: 42px; height: 42px; border-radius: 50%; background: #efeadf; display: grid; place-items: center; font-size: 15px; font-weight: 600; color: rgba(0,0,0,.55); border: 1px solid rgba(0,0,0,.07); }
+  .av.spk { box-shadow: 0 0 0 3px var(--accent); animation: spk 1.6s ease-in-out infinite; }
+  .av.spk2 { animation-delay: .8s; }
+  @keyframes spk { 0%,100% { box-shadow: 0 0 0 2px rgba(22,245,163,.4); } 50% { box-shadow: 0 0 0 4px rgba(22,245,163,1); } }
+  .pill { border: 1px solid rgba(0,0,0,.16); border-radius: 999px; padding: 6px 14px; font-size: 13px; font-weight: 600; }
+  .pill.accent { background: var(--accent); border-color: var(--accent); }
+  .barrow { display: flex; gap: 8px; }
+  .bigtime { font-family: var(--hand); font-size: 54px; line-height: 1; }
+  .dotrow { display: flex; gap: 5px; justify-content: center; }
+  .dotrow i { width: 11px; height: 11px; border-radius: 50%; background: rgba(0,0,0,.16); }
+  .dotrow i.g { background: var(--accent); }
+
+  /* ---- AI flow schematic ---- */
+  .flow { display: flex; align-items: center; justify-content: center; gap: 16px; margin: 30px 0 4px; }
+  .node { flex: 1; max-width: 290px; background: var(--surface); border: 2px solid #000; border-radius: 18px; padding: 22px 18px; text-align: center; }
+  .node.accent { background: var(--accent); }
+  .node .nicon { width: 40px; height: 40px; display: block; margin: 0 auto 10px; }
+  .node b { font-family: var(--hand); font-weight: 400; font-size: 26px; display: block; }
+  .node span { font-size: 14px; color: var(--muted); display: block; margin-top: 6px; line-height: 1.3; }
+  .node.accent span { color: rgba(0,0,0,.62); }
+  .farrow { font-size: 28px; color: var(--accent); font-weight: 700; animation: apulse 2.2s ease-in-out infinite; }
+  @keyframes apulse { 0%,100% { opacity: .5; transform: translateX(0); } 50% { opacity: 1; transform: translateX(4px); } }
+
+  /* ---- team slide ---- */
+  .pphoto { width: 132px; height: 132px; border-radius: 50%; object-fit: cover; border: 2px solid #000; flex: none; background: #efeadf; }
+  .pname { font-family: var(--hand); font-size: 33px; line-height: 1; }
+  .prole { font-size: 14px; color: var(--accent); font-weight: 700; margin-top: 5px; }
+  .pbio { font-size: 16px; color: var(--muted); line-height: 1.42; margin: 11px 0 0; max-width: 30ch; }
+  .badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 11px; }
+  .badge { background: rgba(22,245,163,.16); border: 1px solid rgba(22,245,163,.5); color: #000; border-radius: 999px; padding: 4px 11px; font-size: 12.5px; font-weight: 600; }
+  /* cute hand-drawn photo annotations */
+  .photowrap { position: relative; flex: none; }
+  .note { position: absolute; font-family: var(--hand); font-size: 23px; color: #000; white-space: nowrap; z-index: 6; }
+  .note .ar { position: absolute; width: 48px; height: 42px; overflow: visible; }
+  .note-adam { top: 140px; left: -6px; }
+  .note-adam .ar { top: -34px; left: 66px; }
+  .note-aaron { top: -46px; left: 2px; }
+  .note-aaron .ar { top: 22px; left: 64px; }
+  /* homelab proof photo */
+  .homelab { position: absolute; right: 84px; bottom: 58px; width: 188px; text-align: center; z-index: 4; }
+  .homelab img { width: 100%; border-radius: 10px; border: 2px solid #000; display: block; }
+  .homelab .cap { font-size: 12px; color: var(--muted); display: block; margin-top: 6px; font-weight: 600; }
+  /* proof strip (ties the homelab photo to the story + traction) */
+  .proof { display: flex; align-items: center; gap: 22px; margin-top: 32px; background: var(--surface); border-radius: 16px; padding: 16px 22px; border: 1px solid rgba(0,0,0,.08); box-shadow: 0 10px 26px rgba(0,0,0,.06); }
+  .proofimg { width: 156px; height: 94px; object-fit: cover; border-radius: 10px; border: 2px solid #000; flex: none; }
+  .proofh { font-family: var(--hand); font-size: 26px; line-height: 1; }
+  .proofp { font-size: 15px; color: var(--muted); margin-top: 6px; line-height: 1.45; }
+  /* centered, supporting founder proof image */
+  .proofcenter { display: flex; flex-direction: column; align-items: center; gap: 9px; margin-top: 24px; }
+  .proofimg2 { width: 196px; height: 112px; object-fit: cover; border-radius: 12px; border: 2px solid #000; box-shadow: 0 8px 20px rgba(0,0,0,.08); }
+  .proofcap { font-size: 14px; color: var(--muted); max-width: 56ch; text-align: center; line-height: 1.4; }
+  .proofcap strong { color: #000; }
+
+  /* TAM/SAM/SOM */
+  .rings { position: relative; width: 380px; height: 380px; margin: 0 auto; }
+  .ring { position: absolute; border-radius: 50%; border: 2px solid #000; display: flex; align-items: flex-start; justify-content: center; }
+  .r1 { inset: 0; background: rgba(22,245,163,.06); }
+  .r2 { inset: 74px; background: rgba(22,245,163,.12); }
+  .r3 { inset: 148px; background: var(--accent); }
+  .ring b { font-weight: 700; margin-top: 12px; font-size: 15px; }
+
+  /* investor-grade market sizing */
+  .funnel { display: flex; flex-direction: column; gap: 12px; justify-content: center; }
+  .tier { display: flex; align-items: center; gap: 18px; border-radius: 14px; padding: 13px 22px; border: 2px solid #000; }
+  .tier.tam { background: rgba(22,245,163,.10); width: 100%; }
+  .tier.sam { background: rgba(22,245,163,.32); width: 88%; }
+  .tier.som { background: var(--accent); width: 74%; }
+  .tval { font-family: var(--hand); font-size: 46px; line-height: 1; flex: none; min-width: 150px; }
+  .tlabel { font-size: 16px; font-weight: 600; }
+  .tdesc { font-size: 13px; color: rgba(0,0,0,.55); margin-top: 2px; line-height: 1.3; }
+  .calc { flex: none; width: 268px; align-self: center; background: var(--surface); border: 2px solid #000; border-radius: 16px; padding: 20px 24px; box-shadow: 0 10px 26px rgba(0,0,0,.06); }
+  .calch { font-size: 12px; text-transform: uppercase; letter-spacing: .14em; color: var(--faint); font-weight: 700; margin-bottom: 12px; }
+  .calcline { font-family: var(--hand); font-size: 30px; line-height: 1.3; }
+  .calcline span { font-family: var(--sans); font-size: 15px; color: var(--muted); font-weight: 500; }
+  .calcrule { height: 2px; background: #000; margin: 10px 0; }
+  .calctotal { font-family: var(--hand); font-size: 40px; }
+  .calcnote { font-size: 13px; color: var(--muted); margin-top: 6px; }
+  .takeaway { background: rgba(22,245,163,.14); border: 2px solid var(--accent); border-radius: 14px; padding: 14px 22px; font-size: 17px; font-weight: 600; margin-top: 20px; line-height: 1.4; }
+
+  /* validation slide */
+  .vcard { position: relative; flex: 1; padding: 24px 28px; display: flex; flex-direction: column; }
+  .vcard > *:not(.frame) { position: relative; }
+  .vhead { font-family: var(--hand); font-size: 24px; display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+  .vhead svg { width: 30px; height: 30px; flex: none; }
+  .vbig { font-family: var(--hand); font-size: 40px; line-height: 1.05; margin-bottom: 14px; }
+  .vbig span { font-family: var(--sans); font-size: 15px; color: var(--muted); font-weight: 500; display: block; margin-top: 8px; line-height: 1.35; }
+  .vcard ul.clean li { font-size: 16px; }
+
+  /* execution timeline */
+  .timeline { display: flex; align-items: stretch; gap: 0; flex: 1; }
+  .step { flex: 1; padding: 0 22px; position: relative; display: flex; flex-direction: column; justify-content: center; }
+  .step + .step::before { content: ""; position: absolute; left: 0; top: 28px; width: 1px; bottom: 28px; background: var(--line); }
+  .step .no { font-family: var(--hand); font-size: 40px; color: var(--accent); line-height: 1; }
+  .step h3 { font-family: var(--hand); font-weight: 400; font-size: 30px; margin: 6px 0 8px; }
+  .step p { margin: 0; font-size: 16px; color: var(--muted); line-height: 1.4; }
+
+  /* roadmap: a cooler hand-drawn journey */
+  .roadmap { display: flex; align-items: flex-start; justify-content: center; gap: 8px; flex: 1; }
+  .rstop { flex: 1; max-width: 272px; text-align: center; }
+  .rmark { position: relative; width: 86px; height: 86px; border-radius: 50%; border: 3px solid #000; background: var(--surface); display: grid; place-items: center; margin: 30px auto 14px; box-shadow: 0 6px 16px rgba(0,0,0,.08); }
+  .rmark.now { background: var(--accent); }
+  .rmark > svg { width: 44px; height: 44px; }
+  .rhere { position: absolute; top: -32px; left: 50%; transform: translateX(-50%) rotate(-4deg); font-family: var(--hand); font-size: 18px; color: #000; white-space: nowrap; }
+  .rtitle { font-family: var(--hand); font-size: 30px; }
+  .rtext { font-size: 15px; color: var(--muted); line-height: 1.42; margin: 6px auto 0; max-width: 24ch; }
+  .rarrow { width: 72px; height: 44px; flex: none; align-self: flex-start; margin-top: 54px; }
+
+  /* AI loop schema (appendix) */
+  .ailoop { display: flex; align-items: stretch; justify-content: center; gap: 16px; margin-top: 10px; }
+  .anode { flex: 1; max-width: 234px; background: var(--surface); border: 2px solid #000; border-radius: 18px; padding: 20px 18px; text-align: center; display: flex; flex-direction: column; }
+  .anode .aic { width: 44px; height: 44px; margin: 0 auto 10px; display: block; }
+  .anode b { font-family: var(--hand); font-weight: 400; font-size: 26px; display: block; }
+  .anode span { font-size: 13.5px; color: var(--muted); display: block; margin-top: 5px; line-height: 1.32; }
+  .aarrow2 { font-size: 30px; color: var(--accent); font-weight: 700; flex: none; align-self: center; }
+  .loopnote { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 18px; font-family: var(--hand); font-size: 20px; color: rgba(0,0,0,.6); }
+  .loopnote svg { width: 34px; height: 30px; flex: none; }
+  .aicallout { display: flex; align-items: center; gap: 18px; background: var(--surface); border: 2px solid #000; border-radius: 16px; padding: 16px 22px; margin-top: 22px; }
+  .aicallout > svg { width: 40px; height: 40px; flex: none; }
+  .aicallout p { margin: 0; font-size: 15.5px; line-height: 1.45; color: #111; }
+
+  /* moat slide: animated lock + definition */
+  .moatviz { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+  .lockwrap { position: relative; width: 150px; height: 166px; display: grid; place-items: center; }
+  .lockglow { position: absolute; inset: 0; margin: auto; width: 150px; height: 150px; border-radius: 50%; background: radial-gradient(circle, rgba(22,245,163,.45), transparent 64%); filter: blur(10px); animation: lockglow 3.2s ease-in-out infinite; }
+  .lock { position: relative; width: 150px; height: auto; animation: lockfloat 4s ease-in-out infinite; }
+  .lockhole { transform-box: fill-box; transform-origin: center; animation: holepulse 2s ease-in-out infinite; }
+  @keyframes lockglow { 0%, 100% { transform: scale(.84); opacity: .35; } 50% { transform: scale(1.12); opacity: .85; } }
+  @keyframes lockfloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @keyframes holepulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.3); } }
+  .moatword { font-family: var(--hand); font-size: 28px; margin: 2px 0 0; }
+  .moatdef { font-size: 12.5px; color: rgba(0,0,0,.4); font-style: italic; max-width: 28ch; text-align: center; margin: 0; line-height: 1.35; }
+
+  .ph { background: rgba(22,245,163,.16); border-bottom: 2px dashed rgba(0,0,0,.35); padding: 0 5px; font-weight: 600; white-space: nowrap; }
+
+  /* hero (title / closing) */
+  .hero-title { font-family: var(--hand); font-size: 150px; line-height: .85; margin: 8px 0 0; position: relative; display: inline-block; }
+  .meta { display: flex; gap: 26px; font-size: 15px; color: var(--faint); margin-top: 30px; }
+  .meta .ph { font-weight: 600; }
+
+  /* ---- persistent chrome (screen only) ---- */
+  .chrome { position: absolute; left: 84px; right: 84px; bottom: 34px; display: flex; align-items: center; justify-content: space-between; z-index: 5; }
+  .brand { font-family: var(--hand); font-size: 22px; }
+  .dots { display: flex; gap: 9px; }
+  .pdot { width: 7px; height: 7px; border-radius: 50%; background: rgba(0,0,0,.16); transition: .25s; }
+  .pdot.on { background: var(--accent); transform: scale(1.5); }
+  .pg { font-size: 13px; color: var(--faint); font-variant-numeric: tabular-nums; }
+
+  .hint { position: fixed; left: 50%; bottom: 14px; transform: translateX(-50%); z-index: 20; color: rgba(255,255,255,.55); font-size: 12px; letter-spacing: .04em; }
+
+  /* host-event logo, subtle, top-right of the title slide */
+  .event-logo { position: absolute; top: 36px; right: 74px; width: 108px; height: auto; border-radius: 12px; opacity: .82; z-index: 3; }
+
+  /* top step nav: judges always know which step they're on */
+  .stepper { position: absolute; top: 22px; left: 84px; right: 84px; display: none; gap: 5px; z-index: 6; }
+  .stepper.show { display: flex; }
+  .st { flex: 1; display: flex; align-items: center; justify-content: center; gap: 5px; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; color: rgba(0,0,0,.3); padding-top: 8px; border-top: 2.5px solid rgba(0,0,0,.1); transition: color .2s, border-color .2s; white-space: nowrap; }
+  .st .se { font-size: 13px; filter: grayscale(.5) opacity(.55); transition: .2s; }
+  .st.done { color: rgba(0,0,0,.4); border-top-color: rgba(22,245,163,.5); }
+  .st.cur { color: #000; border-top-color: var(--accent); }
+  .st.cur .se { filter: none; transform: scale(1.18); }
+
+  /* ---- print: one slide per page ---- */
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    .stage { position: static; background: #fff; overflow: visible; }
+    .slides { position: static; transform: none; width: auto; height: auto; }
+    .slide { position: relative !important; opacity: 1 !important; inset: auto; display: flex !important; width: 1280px; height: 720px; break-after: page; page-break-after: always; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .chrome { position: absolute; }
+    .hint { display: none; }
+    .stepper { display: none; }
+    .fring .glow, .fring .prog, .sun-glow, .sun-rays, .steam, .studier .head, .studier .pencil, .av.spk, .farrow, .lockglow, .lock, .lockhole { animation: none; }
+  }
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="slides" id="canvas">
+
+    <!-- ===================== MAIN DECK (≈3 min) ===================== -->
+
+    <!-- 1 · TITLE · "I'm Adam. Like everyone here, I struggle to focus — so I built Nook." -->
+    <section class="slide active mid">
+      <img class="event-logo" src="rallyia-logo.png" alt="RallyIA Future Lab" />
+      <div class="split">
+        <div class="grow">
+          <p class="kicker">A calmer place to study &amp; focus</p>
+          <div class="hero-title">Nook<span class="dot">.</span>
+            <svg style="position:absolute;top:6px;right:-34px;width:42px;height:42px;" viewBox="0 0 40 40" aria-hidden="true"><g stroke="#16f5a3" stroke-width="3" stroke-linecap="round" fill="none"><path d="M20 5 V16 M20 24 V35 M5 20 H16 M24 20 H35"/></g></svg>
+          </div>
+          <p class="lead" style="font-size:30px;margin-top:22px;max-width:22ch;">Focus, made <span class="uline">effortless</span>.</p>
+          <div class="meta">
+            <span>Adam Saoudani · co-founder</span>
+            <span>RallyAI</span>
+          </div>
+        </div>
+        <div style="flex:0 0 380px;">
+          <svg viewBox="0 0 430 470" fill="none" style="width:100%;height:auto;" role="img">
+            <defs>
+              <pattern id="ht" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.15" fill="#000" opacity=".5"/></pattern>
+              <pattern id="htg" width="7" height="7" patternUnits="userSpaceOnUse"><circle cx="3.5" cy="3.5" r="1.5" fill="#16f5a3"/></pattern>
+              <clipPath id="wc"><rect x="74" y="44" width="190" height="200" rx="95"/></clipPath>
+              <filter id="rf" x="-8%" y="-8%" width="116%" height="116%"><feTurbulence type="fractalNoise" baseFrequency="0.016" numOctaves="3" seed="7" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="2" xChannelSelector="R" yChannelSelector="G"/></filter>
+            </defs>
+            <g filter="url(#rf)" stroke-linecap="round" stroke-linejoin="round">
+              <g clip-path="url(#wc)">
+                <rect x="74" y="44" width="190" height="200" fill="#fff"/>
+                <circle cx="205" cy="116" r="34" fill="url(#htg)"/>
+                <circle class="sun-glow" cx="205" cy="116" r="34" fill="#16f5a3" opacity=".22"/>
+                <g class="sun-rays" stroke="#16f5a3" stroke-width="3.2"><path d="M205 64 v-12"/><path d="M243 78 l9 -9"/><path d="M167 78 l-9 -9"/><path d="M253 116 h12"/><path d="M145 116 h-12"/></g>
+                <path d="M74 214 Q150 170 264 208 V244 H74 Z" fill="url(#ht)"/>
+              </g>
+              <rect x="74" y="44" width="190" height="200" rx="95" fill="none" stroke="#000" stroke-width="5"/>
+              <line x1="169" y1="48" x2="169" y2="240" stroke="#000" stroke-width="4"/>
+              <line x1="80" y1="144" x2="258" y2="144" stroke="#000" stroke-width="4"/>
+              <line x1="28" y1="392" x2="402" y2="394" stroke="#000" stroke-width="5"/>
+              <g>
+                <path d="M299 392 L312 349 H357 L369 392 Z" fill="url(#ht)"/>
+                <path d="M299 392 L312 349 H357 L369 392 Z" fill="none" stroke="#000" stroke-width="4.5"/>
+                <path d="M334 349 C334 298 319 270 298 254 C326 266 341 295 341 339" fill="#fff" stroke="#000" stroke-width="4"/>
+                <path d="M334 349 C334 298 351 272 375 258 C352 274 343 303 341 343" fill="url(#htg)" stroke="#000" stroke-width="4"/>
+              </g>
+              <g>
+                <path d="M95 392 V250 C95 223 116 205 142 205 H196 C223 205 243 223 243 250 V392 Z" fill="#fff" stroke="#000" stroke-width="5"/>
+                <path d="M214 390 V252 C214 235 206 223 192 217 C214 219 230 233 230 257 V390 Z" fill="url(#ht)"/>
+                <path d="M103 329 H235 V356 C235 367 226 375 214 375 H124 C112 375 103 367 103 356 Z" fill="url(#htg)" stroke="#000" stroke-width="5"/>
+                <rect x="86" y="299" width="32" height="94" rx="16" fill="#fff" stroke="#000" stroke-width="5"/>
+                <rect x="220" y="299" width="32" height="94" rx="16" fill="#fff" stroke="#000" stroke-width="5"/>
+              </g>
+              <g>
+                <rect x="261" y="367" width="28" height="25" rx="6" fill="#fff" stroke="#000" stroke-width="4"/>
+                <path d="M289 373 q13 0 13 9 t-13 8" fill="none" stroke="#000" stroke-width="4"/>
+                <circle cx="270" cy="377" r="1.6" fill="#000"/><circle cx="280" cy="377" r="1.6" fill="#000"/>
+                <path d="M269 383 q6 5 12 0" fill="none" stroke="#000" stroke-width="2.4"/>
+                <path class="steam steam-a" d="M270 360 q4 -7 0 -14" fill="none" stroke="#16f5a3" stroke-width="3"/><path class="steam steam-b" d="M280 360 q4 -7 0 -14" fill="none" stroke="#16f5a3" stroke-width="3"/>
+              </g>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2 · PROBLEM · "Attention's collapsed to ~47s, apps add noise. Hard to start, harder to stay, hardest alone." -->
+    <section class="slide">
+      <p class="kicker">The problem</p>
+      <h2>Focus is breaking<span class="dot">.</span></h2>
+      <div class="stats">
+        <div class="stat"><b>~47s</b><span>before we switch screens, on average (vs ~2.5 min in 2004)</span></div>
+        <div class="stat"><b>~23 min</b><span>to return to the original task after an interruption</span></div>
+        <div class="stat"><b>residue</b><span>switch tasks, and part of your attention stays stuck on the last one</span></div>
+      </div>
+      <p class="lead" style="font-size:23px;">Starting is hard. Staying is harder. Doing it alone is hardest.</p>
+      <p class="src">Sources: Gloria Mark (UC Irvine), <em>Attention Span</em> (2023) · Sophie Leroy (2009)</p>
+    </section>
+
+    <!-- 3 · SOLUTION + DEMO (dwell here) · "Meet Nook. [start the timer] calm ring; the student works, then stops. Sprints + Rooms = focus together, voice across networks. Least friction to start." -->
+    <section class="slide mid">
+      <p class="kicker">The solution</p>
+      <h2>Meet Nook<span class="dot">.</span></h2>
+      <p class="lead" style="font-size:21px;margin-top:8px;max-width:62ch;">A calm focus ecosystem: slip into focus with the least friction, and stay there. Three ways in<span class="dot">.</span></p>
+      <div class="mocks">
+
+        <div class="winwrap">
+          <div class="win">
+            <div class="bar"><i></i><i></i><i></i></div>
+            <div class="body">
+              <div class="fring" style="width:140px;height:140px;">
+                <div class="glow"></div>
+                <svg viewBox="0 0 300 300" width="140" height="140">
+                  <circle class="track" cx="150" cy="150" r="133" fill="none" stroke-width="16"/>
+                  <circle class="prog" id="ring" cx="150" cy="150" r="133" fill="none" stroke-width="16" stroke-dasharray="836"/>
+                </svg>
+                <div class="t" id="clock" style="font-size:26px;">25:00</div>
+              </div>
+              <svg class="studier studying" id="studier" viewBox="0 0 260 212" style="width:150px;height:auto;" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="120" y="150" width="128" height="9" rx="3" fill="#fff" stroke="#000" stroke-width="4"/>
+                <line x1="136" y1="159" x2="136" y2="202" stroke="#000" stroke-width="4"/>
+                <line x1="236" y1="159" x2="236" y2="202" stroke="#000" stroke-width="4"/>
+                <line x1="58" y1="150" x2="100" y2="150" stroke="#000" stroke-width="4"/>
+                <line x1="64" y1="150" x2="58" y2="202" stroke="#000" stroke-width="4"/>
+                <line x1="94" y1="150" x2="100" y2="202" stroke="#000" stroke-width="4"/>
+                <rect class="book" x="150" y="134" width="62" height="16" rx="2" fill="#fff" stroke="#000" stroke-width="3.5"/>
+                <line x1="181" y1="134" x2="181" y2="150" stroke="#000" stroke-width="3"/>
+                <path d="M78 150 C73 118 84 96 106 90 C118 100 113 130 104 150 Z" fill="#fff" stroke="#000" stroke-width="5"/>
+                <g class="head"><circle cx="112" cy="73" r="17" fill="#fff" stroke="#000" stroke-width="4.5"/><path d="M96 70 C97 55 127 55 128 70" fill="#000"/></g>
+                <g class="arm"><path d="M104 100 C122 108 146 124 162 136" fill="none" stroke="#000" stroke-width="5"/><circle cx="163" cy="137" r="4.5" fill="#fff" stroke="#000" stroke-width="3"/><line class="pencil" x1="170" y1="126" x2="160" y2="142" stroke="#16f5a3" stroke-width="4.5"/></g>
+              </svg>
+              <div class="wsub">focusing…</div>
+            </div>
+          </div>
+          <div class="wlabel">Focus<span class="dot">.</span></div>
+        </div>
+
+        <div class="winwrap">
+          <div class="win">
+            <div class="bar"><i></i><i></i><i></i></div>
+            <div class="body" style="justify-content:flex-start;padding-top:30px;gap:15px;">
+              <div class="wtitle">Calculus grind 🎙️</div>
+              <div class="wsub">4 in voice</div>
+              <div class="avrow">
+                <div class="av spk">A</div>
+                <div class="av">M</div>
+                <div class="av spk spk2">K</div>
+                <div class="av">J</div>
+              </div>
+              <div class="barrow"><div class="pill accent">🎙️ Mute</div><div class="pill">Leave</div></div>
+            </div>
+          </div>
+          <div class="wlabel">Rooms<span class="dot">.</span></div>
+        </div>
+
+        <div class="winwrap">
+          <div class="win">
+            <div class="bar"><i></i><i></i><i></i></div>
+            <div class="body" style="gap:13px;">
+              <div class="wsub">Next sprint · live</div>
+              <div class="bigtime">12:00</div>
+              <div class="wsub">37 focusing now</div>
+              <div class="dotrow"><i class="g"></i><i></i><i class="g"></i><i></i><i></i><i class="g"></i><i></i></div>
+            </div>
+          </div>
+          <div class="wlabel">Sprints<span class="dot">.</span></div>
+        </div>
+
+      </div>
+      <p class="src">Live demo on screen · grounded in decades of focus research (appendix).</p>
+    </section>
+
+    <!-- 4 · AI · "Every session teaches Nook what helps YOU focus. Calm AI that protects attention, not competes for it." -->
+    <section class="slide mid">
+      <p class="kicker">The AI</p>
+      <h2>Calm AI, in the periphery<span class="dot">.</span></h2>
+      <div class="flow">
+        <div class="node">
+          <svg class="nicon" viewBox="0 0 40 40" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="22" r="13" stroke="#000" stroke-width="3"/><path d="M15 6 H25 M20 6 V10" stroke="#000" stroke-width="3"/><path d="M20 22 V14" stroke="#16f5a3" stroke-width="3"/></svg>
+          <b>Focus session</b><span>signals on what helps you</span>
+        </div>
+        <div class="farrow">→</div>
+        <div class="node">
+          <svg class="nicon" viewBox="0 0 40 40" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="20" cy="20" r="5" stroke="#000" stroke-width="3"/><path d="M20 5 V12 M20 28 V35 M5 20 H12 M28 20 H35" stroke="#16f5a3" stroke-width="3"/></svg>
+          <b>Nook learns</b><span>your best times &amp; structures</span>
+        </div>
+        <div class="farrow">→</div>
+        <div class="node accent">
+          <svg class="nicon" viewBox="0 0 40 40" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M8 33 H33 M8 33 V8" stroke="#000" stroke-width="3"/><path d="M13 27 L19 19 L25 23 L32 12" stroke="#000" stroke-width="3"/></svg>
+          <b>Calm insights</b><span>for you, schools &amp; companies</span>
+        </div>
+      </div>
+      <p class="quote" style="text-align:center;max-width:none;margin-top:20px;">"Intelligence that <span class="uline">protects</span> your attention, not competes for it."</p>
+      <p class="src" style="text-align:center;">On the roadmap, built on opt-in, anonymized focus signals.</p>
+    </section>
+
+    <!-- 5 · VALIDATION · "50+ interviews, 35 confirmed the problem. ~10 testers came back to focus rooms repeatedly and reported better focus." -->
+    <section class="slide mid">
+      <p class="kicker">Validation</p>
+      <h2>They said it. Then they used it<span class="dot">.</span></h2>
+      <div class="split" style="margin-top:24px;gap:30px;align-items:stretch;flex:0 0 auto;">
+        <div class="vcard">
+          <svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg>
+          <div class="vhead"><svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 6 H27 V22 H14 L8 27 V22 H5 Z"/><path d="M11 12 H21 M11 16 H18" stroke="#16f5a3"/></svg>Discovery · 50+ interviews</div>
+          <div class="vbig">35+ <span>of ~50 students &amp; developers (70%) reported recurring focus &amp; accountability struggles.</span></div>
+          <ul class="clean">
+            <li>Most patch it with Discord, Pomodoro timers, study servers, music, group chats.</li>
+            <li>Many didn't know a dedicated focus platform could exist.</li>
+          </ul>
+        </div>
+        <div class="vcard">
+          <svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg>
+          <div class="vhead"><svg viewBox="0 0 32 32" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 5 L25 15 L17 17 L21 26 L17 27 L13 18 L8 23 Z"/></svg>Usage · ~10 early testers</div>
+          <div class="vbig">Repeat use <span>of focus rooms, not one-time trials.</span></div>
+          <ul class="clean">
+            <li>Reported improved focus and willingness to study during sessions.</li>
+            <li>Their feedback shaped Nook's room-based accountability.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="src" style="margin-top:16px;">Early stage. Next: weekly active users, 7-day return, and room-session counts.</p>
+    </section>
+
+    <!-- 6 · BUSINESS MODEL · "Free for people; paid by schools + companies + opt-in insights. Privacy is the moat. Duolingo's shape." -->
+    <section class="slide mid">
+      <p class="kicker">Business model</p>
+      <h2>Free for people. Paid by institutions<span class="dot">.</span></h2>
+      <div class="split" style="margin-top:24px;">
+        <div class="grow">
+          <ul class="clean">
+            <li><span class="hl">Free</span> for individuals, that's how we scale.</li>
+            <li><span class="hl">Paid</span> by schools &amp; companies (the focus layer).</li>
+            <li><span class="hl">Insights</span>, anonymous and only with permission, never personal data.</li>
+          </ul>
+          <p class="src">Proven shape: Duolingo (free → Schools + English Test) · Grammarly (free → enterprise).</p>
+        </div>
+        <div class="grow flywheel">
+          <div class="fly accent">More free users</div>
+          <div class="arrow">↓</div>
+          <div class="fly">More focus &amp; friction data</div>
+          <div class="arrow">↓</div>
+          <div class="fly">Better AI + sharper insights</div>
+          <div class="arrow">↓</div>
+          <div class="fly">More valuable to schools &amp; companies ($)</div>
+          <div class="arrow">↺&nbsp; funds free B2C</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 · MOAT · "Cleanest focus dataset; compounds; privacy competitors can't copy. FERPA/COPPA/GDPR-safe." -->
+    <section class="slide mid">
+      <p class="kicker">Moat</p>
+      <h2>An edge that <span class="uline">compounds</span><span class="dot">.</span></h2>
+      <div class="split" style="margin-top:30px;">
+        <ul class="clean grow" style="align-self:center;">
+          <li>A unique <em>focus dataset</em> that compounds with every session.</li>
+          <li><span class="hl">Privacy-first</span>: a trust advantage rivals can't copy.</li>
+          <li>Built on FERPA · COPPA · GDPR · <span class="uline">CNDP</span> principles.</li>
+        </ul>
+        <div class="grow moatviz">
+          <div class="lockwrap">
+            <div class="lockglow"></div>
+            <svg class="lock" viewBox="0 0 132 150" fill="none" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M42 62 V46 C42 28 90 28 90 46 V62" stroke="#000" stroke-width="6"/>
+              <rect x="28" y="62" width="76" height="64" rx="12" fill="#fff" stroke="#000" stroke-width="6"/>
+              <circle class="lockhole" cx="66" cy="88" r="8" fill="#16f5a3" stroke="#000" stroke-width="4"/>
+              <path d="M66 92 V106" stroke="#000" stroke-width="5"/>
+            </svg>
+          </div>
+          <p class="moatword">Privacy is the <span class="uline">moat</span><span class="dot">.</span></p>
+          <p class="moatdef">moat: a durable edge competitors can't easily copy.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7 · FOUNDER · "Solo; built product + infra + brand; self-hosted relays on 2 old laptops for $0. Early, but real and it works." -->
+    <section class="slide mid">
+      <p class="kicker">The team</p>
+      <h2>Two builders<span class="dot">.</span></h2>
+      <div class="split" style="margin-top:26px;gap:48px;align-items:flex-start;flex:0 0 auto;">
+        <div class="grow" style="display:flex;gap:20px;align-items:flex-start;">
+          <span class="photowrap">
+            <img class="pphoto" src="adam.jpeg" alt="Adam Saoudani" />
+            <span class="note note-adam">this is mee :)
+              <svg class="ar" viewBox="0 0 50 44" fill="none" stroke="#16f5a3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 40 C1 22 15 7 39 9"/><path d="M39 9 l-10 -1 M39 9 l-2 10"/></svg>
+            </span>
+          </span>
+          <div>
+            <div class="pname">Adam Saoudani</div>
+            <div class="prole">Co-founder · product, infra &amp; brand</div>
+            <div class="badges"><span class="badge">Full-stack builder</span><span class="badge">Self-hosted infra · $0</span></div>
+            <p class="pbio">Builds Nook end-to-end, and lives the problem as a student.</p>
+          </div>
+        </div>
+        <div class="grow" style="display:flex;gap:20px;align-items:flex-start;">
+          <span class="photowrap">
+            <img class="pphoto" src="aaron.png" alt="Aaron Zhu" />
+            <span class="note note-aaron"><svg class="ar" viewBox="0 0 50 44" fill="none" stroke="#16f5a3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M11 6 C3 24 17 37 39 35"/><path d="M39 35 l-10 1 M39 35 l-1 -10"/></svg>My co-founder</span>
+          </span>
+          <div>
+            <div class="pname">Aaron Zhu</div>
+            <div class="prole">Co-founder · ECE @ CMU</div>
+            <div class="badges"><span class="badge">USACO Platinum</span><span class="badge">Eng intern @ Pingo</span></div>
+            <p class="pbio">Elite competitive programmer. Drives Nook's AI &amp; engineering.</p>
+          </div>
+        </div>
+      </div>
+      <div class="proofcenter">
+        <img class="proofimg2" src="homelab.jpeg" alt="self-hosted relays" />
+        <div class="proofcap"><strong>Built scrappy.</strong> Cross-network voice, self-hosted on two old laptops for <strong>$0</strong>.</div>
+      </div>
+    </section>
+
+    <!-- 8 · VISION + ASK · "One calm focus layer everywhere. I'd love your feedback. Thank you." -->
+    <section class="slide mid">
+      <div class="split" style="align-items:center;">
+        <div class="grow">
+          <p class="kicker">The vision</p>
+          <h2 style="font-size:74px;margin-top:16px;">One calm focus<br/>layer, <span class="uline">everywhere</span><span class="dot">.</span></h2>
+          <p class="lead" style="max-width:40ch;margin-top:24px;font-size:22px;">Free for every person who wants to focus. Quietly powering the schools and companies around them.</p>
+          <div class="meta" style="margin-top:28px;"><span>saoudani.adam@gmail.com · nook-study.vercel.app</span></div>
+        </div>
+        <div style="flex:0 0 360px;display:flex;justify-content:center;">
+          <svg viewBox="0 0 340 280" fill="none" style="width:100%;max-width:340px;height:auto;" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="20" y="150" width="60" height="112" rx="13" fill="#fff" stroke="#000" stroke-width="5"/>
+            <circle cx="50" cy="206" r="16" fill="none" stroke="#16f5a3" stroke-width="4"/>
+            <rect x="98" y="74" width="164" height="104" rx="8" fill="#fff" stroke="#000" stroke-width="5"/>
+            <circle cx="180" cy="126" r="24" fill="none" stroke="#16f5a3" stroke-width="5"/>
+            <path d="M84 192 H276 L266 178 H94 Z" fill="#fff" stroke="#000" stroke-width="5"/>
+            <rect x="280" y="138" width="56" height="96" rx="9" fill="#fff" stroke="#000" stroke-width="5"/>
+            <circle cx="308" cy="184" r="15" fill="none" stroke="#16f5a3" stroke-width="4"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== APPENDIX (Q&A backup) ===================== -->
+
+    <!-- APPENDIX 1 · WHY NOW -->
+    <section class="slide mid">
+      <p class="kicker apx">Appendix · Why now</p>
+      <h2>We focus better <span class="uline">together</span><span class="dot">.</span></h2>
+      <div class="split" style="margin-top:36px;">
+        <ul class="clean grow">
+          <li>Decades of research: we often perform better when working in the presence of others (social facilitation).</li>
+          <li>"Study with me" is now culture, with over <span class="hl">12 billion views</span> on TikTok alone.</li>
+        </ul>
+        <ul class="clean grow">
+          <li>Remote &amp; hybrid made self-directed focus everyone's problem.</li>
+          <li>Calm-tech &amp; digital wellbeing have gone mainstream.</li>
+        </ul>
+      </div>
+      <p class="lead" style="margin-top:34px;font-size:23px;"><span class="hl">The demand for calm, shared focus is already here. The tool isn't.</span></p>
+      <p class="src">Robert Zajonc, <em>Social Facilitation</em> (1965)</p>
+    </section>
+
+    <!-- APPENDIX 2 · THE SCIENCE (your factual backbone — jump here if asked "is this real?") -->
+    <section class="slide">
+      <p class="kicker apx">Appendix · The science</p>
+      <h2>Built on the research<span class="dot">.</span></h2>
+      <div class="sci" style="margin-top:22px;">
+        <div class="card"><svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg><p>When we switch tasks, part of our attention stays stuck on the previous task.</p><span class="by">Leroy, 2009</span></div>
+        <div class="card"><svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg><p>After an interruption, it takes ~23 minutes to return to the original task.</p><span class="by">Mark et al., 2008</span></div>
+        <div class="card"><svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg><p>We often perform better when working in the presence of others.</p><span class="by">Zajonc, 1965 (social facilitation)</span></div>
+        <div class="card"><svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg><p>Simple "implementation plans" increase goal completion.</p><span class="by">Gollwitzer, 1999</span></div>
+        <div class="card"><svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg><p>Notifications can reduce performance even when you don't respond to them.</p><span class="by">Stothart et al., 2015</span></div>
+        <div class="card"><svg class="frame" viewBox="0 0 300 200" preserveAspectRatio="none" fill="none"><path d="M26 9 Q150 5 274 10 Q293 11 292 30 Q294 100 291 172 Q292 191 273 191 Q150 195 27 190 Q8 189 9 170 Q6 100 9 28 Q8 9 26 9 Z" stroke="#000" stroke-width="2.2"/></svg><p>Autonomy and choice improve long-term motivation.</p><span class="by">Deci &amp; Ryan (SDT)</span></div>
+      </div>
+    </section>
+
+    <!-- APPENDIX 3 · MARKET -->
+    <section class="slide mid">
+      <p class="kicker apx">Appendix · Market</p>
+      <h2>Massive market. Clear beachhead<span class="dot">.</span></h2>
+      <div class="split" style="margin-top:18px;align-items:stretch;gap:30px;flex:0 0 auto;">
+        <div class="funnel grow">
+          <div class="tier tam">
+            <div class="tval">$450B+</div>
+            <div class="tinfo"><div class="tlabel">Global EdTech + Productivity</div><div class="tdesc">Education tech, learning platforms &amp; productivity software.</div></div>
+          </div>
+          <div class="tier sam">
+            <div class="tval">$30–76B</div>
+            <div class="tinfo"><div class="tlabel">Digital Learning &amp; Study Tools</div><div class="tdesc">Students using study tools, focus &amp; learning apps.</div></div>
+          </div>
+          <div class="tier som">
+            <div class="tval">$1–3M</div>
+            <div class="tinfo"><div class="tlabel">Initial beachhead · ARR</div><div class="tdesc">First 100–250 schools with paid student seats.</div></div>
+          </div>
+        </div>
+        <div class="calc">
+          <div class="calch">Bottom-up SOM</div>
+          <div class="calcline">100 <span>schools</span></div>
+          <div class="calcline">× 500 <span>students / school</span></div>
+          <div class="calcline">× $20 <span>/ year</span></div>
+          <div class="calcrule"></div>
+          <div class="calctotal">= $1M ARR</div>
+          <div class="calcnote">from just the first 100 schools.</div>
+        </div>
+      </div>
+      <div class="takeaway">Nook doesn't need to win the entire productivity market. Capturing a tiny fraction of students seeking focus and accountability is a venture-scale opportunity.</div>
+      <p class="src" style="margin-top:12px;">Sources: HolonIQ (Global EdTech) · Grand View Research (Productivity &amp; EdTech Software).</p>
+    </section>
+
+    <!-- APPENDIX 4 · EXECUTION -->
+    <section class="slide mid">
+      <p class="kicker apx">Appendix · Execution</p>
+      <h2>One step at a time<span class="dot">.</span></h2>
+      <div class="roadmap" style="margin-top:24px;">
+        <div class="rstop">
+          <div class="rmark now">
+            <span class="rhere">you are here ↓</span>
+            <svg viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M10 23 L19 32 L35 13"/></svg>
+          </div>
+          <div class="rtitle">Now<span class="dot">.</span></div>
+          <p class="rtext">MVP live: Focus, Sprints, Rooms + $0 self-hosted voice. Growing with students.</p>
+        </div>
+        <svg class="rarrow" viewBox="0 0 70 40" fill="none" stroke="#16f5a3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 26 Q22 6 40 20 T64 14"/><path d="M64 14 l-9 -2 M64 14 l-3 9"/></svg>
+        <div class="rstop">
+          <div class="rmark">
+            <svg viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="11" width="20" height="15" rx="2"/><path d="M15 26 V29 M10 29 H20"/><rect x="28" y="15" width="11" height="20" rx="2"/><circle cx="33.5" cy="31" r="1.6" fill="#16f5a3" stroke="none"/></svg>
+          </div>
+          <div class="rtitle">Next<span class="dot">.</span></div>
+          <p class="rtext">Multi-platform (mobile + desktop) and the calm AI layer.</p>
+        </div>
+        <svg class="rarrow" viewBox="0 0 70 40" fill="none" stroke="#16f5a3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 14 Q22 34 40 20 T64 26"/><path d="M64 26 l-9 2 M64 26 l-3 -9"/></svg>
+        <div class="rstop">
+          <div class="rmark">
+            <svg viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 36 V18 L22 9 L36 18 V36"/><path d="M7 36 H37"/><rect x="15" y="25" width="6" height="6"/><rect x="24" y="25" width="6" height="6" stroke="#16f5a3"/></svg>
+          </div>
+          <div class="rtitle">Then<span class="dot">.</span></div>
+          <p class="rtext">B2B: schools &amp; companies + the insights product.</p>
+        </div>
+      </div>
+      <p class="src">Traction: feedback from <strong>50+ developers &amp; teens</strong> (Hack Club community) + mentor &amp; adult input.</p>
+    </section>
+
+    <!-- APPENDIX 5 · HOW THE AI WORKS (technical backup) -->
+    <section class="slide mid">
+      <p class="kicker apx">Appendix · How the AI works</p>
+      <h2>The focus loop<span class="dot">.</span></h2>
+      <div class="ailoop">
+        <div class="anode">
+          <svg class="aic" viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 30 V24 M16 30 V13 M24 30 V19 M32 30 V9"/><path d="M6 36 H38" stroke="#16f5a3"/></svg>
+          <b>Signals</b><span>session length, time of day, completion, who's in the room</span>
+        </div>
+        <div class="aarrow2">→</div>
+        <div class="anode">
+          <svg class="aic" viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="14" r="4"/><circle cx="32" cy="12" r="4"/><circle cx="22" cy="32" r="4"/><path d="M15 16 L20 29 M29 14 L24 29 M16 14 H28" stroke="#16f5a3"/></svg>
+          <b>Learn</b><span>a contextual bandit + light ML find what helps <em>you</em> focus</span>
+        </div>
+        <div class="aarrow2">→</div>
+        <div class="anode">
+          <svg class="aic" viewBox="0 0 44 44" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M8 10 H36 V28 H20 L12 34 V28 H8 Z"/><circle cx="22" cy="19" r="2.4" fill="#16f5a3" stroke="none"/></svg>
+          <b>Nudge</b><span>a gentle, well-timed suggestion (best slot, ideal length)</span>
+        </div>
+      </div>
+      <div class="loopnote">
+        <svg viewBox="0 0 36 32" fill="none" stroke="#16f5a3" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M29 9 A12 12 0 1 0 31 19"/><path d="M29 9 l-8 1 M29 9 l1 8"/></svg>
+        every session sharpens it
+      </div>
+      <div class="aicallout">
+        <svg viewBox="0 0 40 40" fill="none" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><rect x="12" y="5" width="16" height="30" rx="3"/><circle cx="20" cy="19" r="4.5" stroke="#16f5a3"/></svg>
+        <p>An <strong>on-device language model</strong> turns each nudge into calm, human words. Nothing leaves your device. B2B insights stay aggregated and anonymous.</p>
+      </div>
+      <p class="src">Today: simple stats on focus behavior. Roadmap: the full contextual-bandit loop.</p>
+    </section>
+
+    <!-- top step navigation -->
+    <div class="stepper" id="stepper">
+      <div class="st"><span class="se">👋</span>Intro</div>
+      <div class="st"><span class="se">🎯</span>Problem</div>
+      <div class="st"><span class="se">💡</span>Solution</div>
+      <div class="st"><span class="se">✅</span>Proof</div>
+      <div class="st"><span class="se">🤖</span>AI</div>
+      <div class="st"><span class="se">💸</span>Model</div>
+      <div class="st"><span class="se">🔒</span>Moat</div>
+      <div class="st"><span class="se">👥</span>Team</div>
+      <div class="st"><span class="se">🚀</span>Vision</div>
+    </div>
+
+    <!-- persistent chrome -->
+    <div class="chrome">
+      <span class="brand">Nook<span class="dot">.</span></span>
+      <div class="dots" id="dots"></div>
+      <span class="pg" id="pg">01 / 09</span>
+    </div>
+
+  </div>
+</div>
+<div class="hint">← → to move · F11 full screen · Ctrl/Cmd+P → PDF</div>
+
+<script>
+  var canvas = document.getElementById('canvas');
+  var slides = Array.prototype.slice.call(canvas.querySelectorAll('.slide'));
+  var dotsEl = document.getElementById('dots');
+  var pg = document.getElementById('pg');
+  var stepper = document.getElementById('stepper');
+  var steps = stepper.children;
+  var MAIN = 9;            // first 9 slides are the 3-min deck; the rest are appendix
+  var i = 0;
+
+  // progress dots represent the main deck only
+  for (var n = 0; n < MAIN; n++) {
+    var d = document.createElement('span');
+    d.className = 'pdot' + (n === 0 ? ' on' : '');
+    (function (idx) { d.onclick = function () { go(idx); }; })(n);
+    dotsEl.appendChild(d);
+  }
+  var dots = Array.prototype.slice.call(dotsEl.children);
+
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function go(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (s, k) { s.classList.toggle('active', k === i); });
+    var apx = i >= MAIN;
+    dots.forEach(function (d, k) { d.classList.toggle('on', !apx && k === i); });
+    pg.textContent = apx
+      ? 'Appendix · ' + (i - MAIN + 1) + ' / ' + (slides.length - MAIN)
+      : pad(i + 1) + ' / ' + pad(MAIN);
+    var showStep = i > 0 && i < MAIN;
+    stepper.classList.toggle('show', showStep);
+    if (showStep) {
+      for (var j = 0; j < steps.length; j++) {
+        steps[j].classList.toggle('cur', j === i);
+        steps[j].classList.toggle('done', j < i);
+      }
+    }
+  }
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Backspace') { e.preventDefault(); go(i - 1); }
+  });
+
+  // scale the 1280x720 canvas to fit any screen (full-bleed on 16:9)
+  function fit() {
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    canvas.style.transform = 'translate(-50%, -50%) scale(' + s + ')';
+  }
+  window.addEventListener('resize', fit);
+  fit();
+
+  // solution slide focus timer: count the clock down, deplete the ring, study then stop
+  var studier = document.getElementById('studier');
+  var ring = document.getElementById('ring');
+  var clock = document.getElementById('clock');
+  var CYCLE = 9000, lastSec = -1;
+  function tick(now) {
+    var phase = (now % CYCLE) / CYCLE;
+    if (ring) ring.style.strokeDashoffset = (836 * phase).toFixed(1);
+    var rem = Math.max(0, Math.round(1500 * (1 - phase)));
+    if (clock && rem !== lastSec) {
+      clock.textContent = Math.floor(rem / 60) + ':' + ('0' + (rem % 60)).slice(-2);
+      lastSec = rem;
+    }
+    var done = phase > 0.9;
+    if (studier) { studier.classList.toggle('studying', !done); studier.classList.toggle('done', done); }
+    requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+</script>
+</body>
+</html>
