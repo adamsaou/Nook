@@ -2,6 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  getUsername,
+  insertMessage,
+  logFocusSession,
+  touchRoom,
+} from "@nook/api";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 import { ShareRoom } from "./ShareRoom";
@@ -131,11 +137,7 @@ export function RoomView({
           };
           let uname: string = usernames.current.get(row.user_id) ?? "";
           if (!uname) {
-            const { data } = await supabase
-              .from("profiles")
-              .select("username")
-              .eq("id", row.user_id)
-              .single();
+            const { data } = await getUsername(supabase, row.user_id);
             uname = data?.username ?? "anon";
             usernames.current.set(row.user_id, uname);
           }
@@ -155,7 +157,7 @@ export function RoomView({
 
   useEffect(() => {
     const beat = () => {
-      void supabase.rpc("touch_room", { p_room_id: roomId});
+      void touchRoom(supabase, roomId);
     };
     beat();
     const id = setInterval(beat, 30000);
@@ -190,12 +192,12 @@ export function RoomView({
     setFocusing(false);
     setEndsAt(null);
     presenceChannel.current?.track({ userId, username, focusing: false, endsAt: null, updatedAt: Date.now() });
-    await supabase.from("focus_sessions").insert({
-      user_id: userId,
-      room_id: roomId,
-      planned_minutes: DEFAULT_FOCUS_MINUTES,
-      started_at: new Date(startedAt).toISOString(),
-      ended_at: new Date().toISOString(),
+    await logFocusSession(supabase, {
+      userId,
+      roomId,
+      plannedMinutes: DEFAULT_FOCUS_MINUTES,
+      startedAt: new Date(startedAt).toISOString(),
+      endedAt: new Date().toISOString(),
       completed,
       reflection: null,
     });
@@ -206,11 +208,7 @@ export function RoomView({
     const content = draft.trim();
     if (!content) return;
     setDraft("");
-    await supabase.from("messages").insert({
-      room_id: roomId,
-      user_id: userId,
-      content,
-    });
+    await insertMessage(supabase, { roomId, userId, content });
   }
 
   const myRemaining =

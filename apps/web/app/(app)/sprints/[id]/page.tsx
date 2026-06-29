@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { autoJoinSprint, getSprint, getUsername } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 import { SprintSession } from "@/components/sprints/SprintSession";
 
@@ -15,26 +16,13 @@ export default async function SprintPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: sprint } = await supabase
-    .from("sprints")
-    .select("id, starts_at, duration_minutes")
-    .eq("id", id)
-    .maybeSingle();
+  const { data: sprint } = await getSprint(supabase, id);
   if (!sprint) notFound();
 
   // Auto-join if they opened the link directly (idempotent).
-  await supabase
-    .from("sprint_participants")
-    .upsert(
-      { sprint_id: id, user_id: user.id },
-      { onConflict: "sprint_id,user_id", ignoreDuplicates: true },
-    );
+  await autoJoinSprint(supabase, id, user.id);
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await getUsername(supabase, user.id);
 
   return (
     <SprintSession

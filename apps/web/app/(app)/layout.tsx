@@ -1,4 +1,5 @@
 import { ViewTransition } from "react";
+import { getUsername } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 import { AppNav } from "@/components/shared/AppNav";
 
@@ -15,11 +16,7 @@ export default async function AppLayout({
 
   let username: string | null = null;
   if (user) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("username")
-      .eq("id", user.id)
-      .single();
+    const { data: profile } = await getUsername(supabase, user.id);
     username = profile?.username ?? null;
   }
 

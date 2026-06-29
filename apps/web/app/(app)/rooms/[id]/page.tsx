@@ -1,4 +1,11 @@
 import { notFound, redirect } from "next/navigation";
+import {
+  getRoom,
+  getRoomMembership,
+  getRoomMessages,
+  getUsername,
+  joinRoom,
+} from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 import { RoomView } from "@/components/rooms/RoomView";
 
@@ -15,40 +22,22 @@ export default async function RoomPage({
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: room } = await supabase
-    .from("rooms")
-    .select("id, name, visibility, created_by, join_code, kind")
-    .eq("id", id)
-    .maybeSingle();
+  const { data: room } = await getRoom(supabase, id);
   if (!room) notFound();
 
   // Ensure membership (auto-join public rooms entered directly).
-  const { data: membership } = await supabase
-    .from("room_members")
-    .select("room_id")
-    .eq("room_id", id)
-    .eq("user_id", user.id)
-    .maybeSingle();
+  const { data: membership } = await getRoomMembership(supabase, id, user.id);
   if (!membership) {
     if (room.visibility === "public") {
-      await supabase.rpc("join_room", { p_room_id: id });
+      await joinRoom(supabase, id);
     } else {
       redirect(`/rooms?error=${encodeURIComponent("That room is private")}`);
     }
   }
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("username")
-    .eq("id", user.id)
-    .single();
+  const { data: profile } = await getUsername(supabase, user.id);
 
-  const { data: rows } = await supabase
-    .from("messages")
-    .select("id, user_id, content, created_at, profiles(username)")
-    .eq("room_id", id)
-    .order("created_at", { ascending: true })
-    .limit(50);
+  const { data: rows } = await getRoomMessages(supabase, id);
 
   const initialMessages = (rows ?? []).map((m) => ({
     id: m.id as string,

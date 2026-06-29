@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listMyMemberships, listPublicRooms } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
 import { createRoom, joinByCode, joinRandom, joinRoom } from "./actions";
@@ -17,16 +18,8 @@ export default async function RoomsPage({
   } = await supabase.auth.getUser();
 
   const [{ data: publicRooms }, { data: memberships }] = await Promise.all([
-    supabase
-      .from("rooms")
-      .select("id, name, visibility, kind, created_at")
-      .eq("visibility", "public")
-      .order("created_at", { ascending: false })
-      .limit(50),
-    supabase
-      .from("room_members")
-      .select("room_id, rooms(id, name, visibility)")
-      .eq("user_id", user!.id),
+    listPublicRooms(supabase),
+    listMyMemberships(supabase, user!.id),
   ]);
 
   const myRoomIds = new Set((memberships ?? []).map((m) => m.room_id));
