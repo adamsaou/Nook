@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { listMyJoinedSprints, listUpcomingSprints } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 import { Button } from "@/components/ui/Button";
 import { joinSprint } from "./actions";
@@ -21,20 +22,20 @@ export default async function SprintsPage({
   const slots = nextSlots(new Date(now), SPRINT_LOOKAHEAD);
   const slotIsos = slots.map((s) => s.toISOString());
 
-  const { data: existing } = await supabase
-    .from("sprints")
-    .select("id, starts_at, duration_minutes, sprint_participants(count)")
-    .in("starts_at", slotIsos)
-    .eq("duration_minutes", SPRINT_DEFAULT_DURATION);
+  const { data: existing } = await listUpcomingSprints(
+    supabase,
+    slotIsos,
+    SPRINT_DEFAULT_DURATION,
+  );
 
   const sprintIds = (existing ?? []).map((s) => s.id as string);
   let joinedIds = new Set<string>();
   if (user && sprintIds.length > 0) {
-    const { data: mine } = await supabase
-      .from("sprint_participants")
-      .select("sprint_id")
-      .eq("user_id", user.id)
-      .in("sprint_id", sprintIds);
+    const { data: mine } = await listMyJoinedSprints(
+      supabase,
+      user.id,
+      sprintIds,
+    );
     joinedIds = new Set((mine ?? []).map((m) => m.sprint_id as string));
   }
 

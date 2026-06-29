@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { joinRoomByCode } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 
 // Share-link target: /rooms/join?code=XXXXXX — joins via the code, then forwards
@@ -19,7 +20,7 @@ export default async function JoinByLinkPage({
     redirect(`/login?next=${encodeURIComponent(`/rooms/join?code=${code}`)}`);
   }
 
-  const { data, error } = await supabase.rpc("join_room_by_code", { p_code: code });
+  const { data, error } = await joinRoomByCode(supabase, code);
   if (error) {
     redirect(`/rooms?error=${encodeURIComponent(error.message)}`);
   }

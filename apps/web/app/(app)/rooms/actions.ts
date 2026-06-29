@@ -2,6 +2,12 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import {
+  createRoom as createRoomQuery,
+  joinRoom as joinRoomQuery,
+  joinRoomByCode,
+  listPublicRoomIds,
+} from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 
 function roomsError(message: string): never {
@@ -23,11 +29,12 @@ export async function createRoom(formData: FormData) {
 
   if (name.length < 1) roomsError("Room name is required");
 
-  const { data, error } = await supabase
-    .from("rooms")
-    .insert({ name, visibility, kind, created_by: user.id })
-    .select("id")
-    .single();
+  const { data, error } = await createRoomQuery(supabase, {
+    name,
+    visibility,
+    kind,
+    createdBy: user.id,
+  });
   if (error) roomsError(error.message);
 
   revalidatePath("/rooms");
@@ -44,7 +51,7 @@ export async function joinRoom(formData: FormData) {
   const roomId = String(formData.get("roomId") ?? "");
   if (!roomId) roomsError("Missing room");
 
-  const { error } = await supabase.rpc("join_room", { p_room_id: roomId });
+  const { error } = await joinRoomQuery(supabase, roomId);
   if (error) roomsError(error.message);
 
   revalidatePath("/rooms");
@@ -58,14 +65,11 @@ export async function joinRandom() {
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: rooms } = await supabase
-    .from("rooms")
-    .select("id")
-    .eq("visibility", "public");
+  const { data: rooms } = await listPublicRoomIds(supabase);
   if (!rooms || rooms.length === 0) roomsError("No public rooms yet — create one!");
 
   const random = rooms[Math.floor(Math.random() * rooms.length)];
-  const { error } = await supabase.rpc("join_room", { p_room_id: random.id });
+  const { error } = await joinRoomQuery(supabase, random.id);
   if (error) roomsError(error.message);
 
   redirect(`/rooms/${random.id}`);
@@ -81,7 +85,7 @@ export async function joinByCode(formData: FormData){
   const code = String(formData.get("code") ?? "").trim();
   if(!code) roomsError("Enter a join code");
 
-  const { data, error} = await supabase.rpc("join_room_by_code", {p_code: code});
+  const { data, error} = await joinRoomByCode(supabase, code);
   if (error) roomsError(error.message);
 
   redirect(`/rooms/${data}`);

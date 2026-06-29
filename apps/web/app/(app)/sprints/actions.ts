@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { joinSprint as joinSprintQuery } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 
 export async function joinSprint(formData: FormData) {
@@ -16,9 +17,9 @@ export async function joinSprint(formData: FormData) {
     redirect(`/sprints?error=${encodeURIComponent("Invalid sprint")}`);
   }
 
-  const { data, error } = await supabase.rpc("join_sprint", {
-    p_starts_at: startsAt,
-    p_duration: duration,
+  const { data, error } = await joinSprintQuery(supabase, {
+    startsAt,
+    duration,
   });
   if (error) {
     redirect(`/sprints?error=${encodeURIComponent(error.message)}`);

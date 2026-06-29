@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { logFocusSession } from "@nook/api";
 import { createClient } from "@/lib/supabase/client";
 import { track } from "@/lib/analytics";
 import {
@@ -113,12 +114,12 @@ export default function FocusSession({ userId }: { userId: string | null }) {
     logSession({ startedAt, endedAt, plannedMinutes: durationMin, completed, reflection });
 
     if (userId) {
-      void supabase.from("focus_sessions").insert({
-        user_id: userId,
-        room_id: null,
-        planned_minutes: durationMin,
-        started_at: new Date(startedAt).toISOString(),
-        ended_at: new Date(endedAt).toISOString(),
+      void logFocusSession(supabase, {
+        userId,
+        roomId: null,
+        plannedMinutes: durationMin,
+        startedAt: new Date(startedAt).toISOString(),
+        endedAt: new Date(endedAt).toISOString(),
         completed,
         reflection,
       });

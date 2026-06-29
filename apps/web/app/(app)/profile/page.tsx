@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getUsername, listRecentFocusSessions } from "@nook/api";
 import { createClient } from "@/lib/supabase/server";
 
 function dayKey(d: Date) {
@@ -23,12 +24,12 @@ export default async function ProfilePage() {
   const nowMs = Date.now();
 
   const [{ data: profile }, { data: sessions }] = await Promise.all([
-    supabase.from("profiles").select("username").eq("id", user.id).single(),
-    supabase
-      .from("focus_sessions")
-      .select("started_at, planned_minutes")
-      .eq("user_id", user.id)
-      .gte("started_at", new Date(nowMs - 7 * 86_400_000).toISOString()),
+    getUsername(supabase, user.id),
+    listRecentFocusSessions(
+      supabase,
+      user.id,
+      new Date(nowMs - 7 * 86_400_000).toISOString(),
+    ),
   ]);
 
   const daysWithFocus = new Set<string>();

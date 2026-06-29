@@ -2,6 +2,11 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  logFocusSession,
+  markSprintCompleted,
+  updateFocusReflection,
+} from "@nook/api";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/Button";
 
@@ -80,25 +85,17 @@ export function SprintSession({
   }, [supabase, sprintId, userId, username]);
 
   async function logSession() {
-    const { data } = await supabase
-      .from("focus_sessions")
-      .insert({
-        user_id: userId,
-        room_id: null,
-        planned_minutes: durationMinutes,
-        started_at: new Date(startsAtMs).toISOString(),
-        ended_at: new Date(endsAtMs).toISOString(),
-        completed: true,
-        reflection: null,
-      })
-      .select("id")
-      .single();
+    const { data } = await logFocusSession(supabase, {
+      userId,
+      roomId: null,
+      plannedMinutes: durationMinutes,
+      startedAt: new Date(startsAtMs).toISOString(),
+      endedAt: new Date(endsAtMs).toISOString(),
+      completed: true,
+      reflection: null,
+    });
     sessionIdRef.current = (data?.id as string) ?? null;
-    await supabase
-      .from("sprint_participants")
-      .update({ completed: true })
-      .eq("sprint_id", sprintId)
-      .eq("user_id", userId);
+    await markSprintCompleted(supabase, sprintId, userId);
   }
 
   // ---- Ticker: drives the countdown + logs the session once it ends ----
@@ -118,10 +115,11 @@ export function SprintSession({
   async function reflect(helped: boolean) {
     setReflected(true);
     if (sessionIdRef.current) {
-      await supabase
-        .from("focus_sessions")
-        .update({ reflection: helped ? "helped" : "did-not-help" })
-        .eq("id", sessionIdRef.current);
+      await updateFocusReflection(
+        supabase,
+        sessionIdRef.current,
+        helped ? "helped" : "did-not-help",
+      );
     }
   }
 
