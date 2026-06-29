@@ -1,0 +1,9 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+  - "tooling/*"
+
+# native packages allowed to run install/build scripts
+allowBuilds:
+  sharp: true
+  unrs-resolver: true
