@@ -21,9 +21,35 @@ const gochiHand = Gochi_Hand({
   subsets: ["latin"],
 });
 
+// Canonical site URL: explicit env wins, else Vercel's production domain
+// (auto-tracks the custom domain once assigned), else localhost in dev.
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : process.env.VERCEL_PROJECT_PRODUCTION_URL
+    ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+    : "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: APP_NAME,
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: `${APP_NAME} · Focus, made effortless`,
+    template: `%s · ${APP_NAME}`,
+  },
   description: APP_DESCRIPTION,
+  applicationName: APP_NAME,
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: `${APP_NAME} · Focus, made effortless`,
+    description: APP_DESCRIPTION,
+    url: "/",
+    locale: "en_US",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${APP_NAME} · Focus, made effortless`,
+    description: APP_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

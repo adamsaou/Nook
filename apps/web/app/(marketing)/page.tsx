@@ -21,7 +21,7 @@ export default function Home() {
           <section className={styles.hero}>
             <div>
               <p className={`${styles.eyebrow} ${styles.settle} ${styles.d1}`}>
-                A calmer way to study
+                Focus, made effortless
               </p>
               <h1 className={`${styles.wordmark} ${styles.settle} ${styles.d2}`}>
                 <span className={styles.ghost} aria-hidden="true">
@@ -37,8 +37,8 @@ export default function Home() {
                 </svg>
               </h1>
               <p className={`${styles.tagline} ${styles.settle} ${styles.d3}`}>
-                A quiet corner of the internet to focus, find your rhythm, and study
-                alongside others.
+                A quiet corner of the internet to focus, find your rhythm, and do
+                your best work, alone or alongside others.
               </p>
               <div className={`${styles.actions} ${styles.settle} ${styles.d4}`}>
                 <Link className={`${styles.btn} ${styles.btnPrimary}`} href="/focus">

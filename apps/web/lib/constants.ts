@@ -1,7 +1,7 @@
 export const APP_NAME = "Nook";
 
 export const APP_DESCRIPTION =
-  "The go-to study platform to keep you focused and engaged.";
+  "Nook is a calm space to focus, find your rhythm, and do your best work, alone or alongside others.";
 
 export const ROUTES = {
   home: "/",
